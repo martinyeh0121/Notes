@@ -1,0 +1,69 @@
+2 23 17:25
+2 22 21:30 / 35
+
+
+sudo chown -R 1000:1000 ./n8n_storage
+mobagel@mbvm250102:~/mobagel/test/n8n/n8nHost_psql$ sudo chmod -R 700 ./n8n_storage
+drwx------ 2 mobagel mobagel 4096 Feb 25 15:32 ./n8n_storage
+
+sudo chown -R 999:999 ./db_storage
+mobagel@mbvm250102:~/mobagel/test/n8n/n8nHost_psql$ sudo chmod -R 700 ./db_storage
+drwx------ 19 lxd docker 4096 Feb 25 15:16 ./db_storage
+
+docker run --rm postgres:16-alpine id postgres
+uid=999(postgres) gid=999(postgres) groups=999(postgres)
+
+
+
+graylog query:
+\[32minfo
+\[34mdebug
+timestamp:["2025-03-21 08:48:00.000" TO "2025-03-21 08:49:00.000"]
+
+
+
+
+npm install syslog-client
+
+
+cd /var/lib/docker/containers
+
+ls -l -R | grep "\-json"
+
+env | grep ""
+
+
+
+tmux
+
+tmux new -s new_name
+
+tmux attach -t mysession
+
+tmux rename-session new_name
+
+tmux kill-session -t mysession    /    exit
+
+tmux ls
+
+
+
+在同一個 tmux session 裡，你也可以：
+
+功能			操作
+
+新增視窗		Ctrl + b 然後按 c
+在視窗間切換		Ctrl + b 然後按 n 或 p
+分割畫面（垂直）	Ctrl + b 然後按 %
+分割畫面（水平）	Ctrl + b 然後按 "
+關閉畫面		exit（關閉分頁）或 Ctrl + d
+
+
+
+sudo cp /etc/snmp/snmpd.conf ~/snmpd.conf
+sudo chown $USER:$USER ~/snmpd.conf
+code ~/snmpd.conf
+
+sudo cp /etc/snmp/snmpd.conf ~/snmpd.conf
+
+	

@@ -1,0 +1,26 @@
+header
+body
+
+ 
+cookie user
+session server
+
+
+jwt
+
+ssl / tls 傳輸加密
+
+flask -> fastapi
+gunicorn 多請求
+WSGI
+
+
+
+
+
+# test
+# touch backup/credentials/cre0214.json
+# n8n export:credentials --all --output=./backup/credentials/cre0214.json
+# n8n export:workflow --all --output=./backup/workflows/wf0214.json
+# n8n import:credentials --input=./backup/credentials/cre0214.json
+# n8n import:workflow --input=./backup/workflows/wf0214.json
