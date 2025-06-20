@@ -10,7 +10,7 @@
   * [prmetheus docker 推薦參考](https://github.com/vegasbrianc) (準備看看，)
 
 ## code
-  * [github](https://github.com/martinyeh0121/network-monitoring.git)
+  * [github](https://github.com/martinyeh0121/network-monitoring_prometheus.git)
 
 ## intro
 
@@ -225,7 +225,11 @@
 
 ---
 
+## alertmanager
 
+* ref
+douc
+https://prometheus.io/docs/alerting/latest/configuration/#slack_config
 
 # snmp docker
 

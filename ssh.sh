@@ -6,4 +6,4 @@ cat ~/.ssh/id_rsa.pub  # 複製此公鑰
 
 ssh -T git@github.com # yes
 git remote set-url origin git@github.com:martinyeh0121/notes.git
-git push -u origin master
+git push -u origin main
