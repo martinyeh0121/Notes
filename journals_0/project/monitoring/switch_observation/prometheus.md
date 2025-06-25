@@ -7,6 +7,8 @@
 - [intro](#intro)
 - [prometheus + grafana](#prometheus--grafana)
   - [my questions](#my-questions)
+  - [prometheus.yml](#prometheusyml)
+  - []
 - [snmp_exporter](#snmp_exporter)
   - [requirement](#requirement)
   - [流程](#流程)
@@ -50,14 +52,94 @@
 
 ## prometheus + grafana
 
-### my questions
+### intro / questions
 
 * 觀念
-  #### 1. prometheus staleness 機制 (5min) 導致 grafana query 異常
+  #### 1. Prometheus  觀念
+    - Metric: Prometheus 資料儲存形式，下圖為 自訂metric: ifInBps (使用 recording rule 自訂)
 
-    https://chatgpt.com/share/685267ec-82c8-800c-bb10-b75b27475bdc
+    <img src="image-11.png" alt="input" width="600" />
 
-  #### 2. 多 job 管理
+    - Label: 每條 time series 都可以有一組標籤（key-value pairs）來描述屬性，用{}包住，可用來檢索/篩選。
+      * ifInBps{ifAlias="MBPC220405", ifDescr="swp13", ifIndex="14", ifName="swp13", instance="192.168.5.102", job="snmp_zyxel_dynamic"}
+      * job: 對應的 scrape_config 
+      * ifIndex / ifAlias / ifDescr / ifName：介面資訊，可用來進行 lookup
+      * instance：目標設備的 IP（即 target）
+    - 
+  
+
+  #### 2. Staleness (陳舊性) 機制導致 prometheus query 只包含短期有更新的 metric (5min 內)  
+    - ref
+    [google](https://www.google.com/search?q=staleness+prometheus&sca_esv=e636a3bf86a437ec&ei=wE9aaKypGcSevr0PnJPPqAU&oq=staleness+pro&gs_lp=Egxnd3Mtd2l6LXNlcnAiDXN0YWxlbmVzcyBwcm8qAggCMgcQABiABBgTMgYQABgTGB4yBhAAGBMYHjIIEAAYgAQYogQyCBAAGIAEGKIEMggQABgTGAgYHjIIEAAYExgIGB4yCBAAGBMYCBgeMggQABgTGAgYHjIIEAAYExgIGB5IiStQhQVY6x5wAXgBkAEAmAFMoAHTAqoBATW4AQPIAQD4AQGYAgagAvsCwgIKEAAYsAMY1gQYR8ICBRAAGIAEwgIFEAAY7wXCAgQQABgemAMAiAYBkAYFkgcBNqAH0w-yBwE1uAfwAsIHBzAuMy4xLjLIBx8&sclient=gws-wiz-serp)
+    [gpt](https://chatgpt.com/share/685267ec-82c8-800c-bb10-b75b27475bdc)
+
+    - ans: last_over_time(some_metric[1h])
+
+
+
+### prometheus.yml
+[Configuration | Prometheus](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
+- example:
+``` yml
+# head
+global:
+  ## global_vars 可單獨調整
+  # scrape_interval: 15s # data scraping間隔
+  # scrape_timeout: 10s
+  evaluation_interval: 1m # alerting / recording rule間隔
+
+## include rule files
+rule_files:  
+  - "rules/snmp_switch_IF_mib.yml"
+
+## 抓取配置
+scrape_configs:
+- job_name: 'snmp_zyxel_dynamic'
+  scrape_interval: 15s
+  static_configs:
+    - targets: ["192.168.5.102"]  # switch
+  metrics_path: /snmp
+  params:
+    auth: [snmp_zyxel_v2c]
+    module: [if_mib_dynamic]
+  relabel_configs:
+    ## snmp_exporter variable relabel 
+    - source_labels: [__address__]   
+      target_label: __param_target    # snmp_exporter ip -> switch ip
+    - source_labels: [__param_target] # switch ip -> instance
+      target_label: instance
+    - target_label: __address__
+      replacement: snmp-exporter:9116
+```
+
+#### rules.yml
+``` yml
+## head
+groups:
+
+  ## recording rules: 建立自訂 metric 並持續記錄
+  - name: snmp_switch_recording  
+    rules:
+      - record: ifInBps
+        expr: irate(ifHCInOctets{job="snmp_zyxel_dynamic"}[30s]) * 8
+      - record: ifOutBps
+        expr: irate(ifHCOutOctets{job="snmp_zyxel_dynamic"}[30s]) * 8
+
+  ## alerting rules: 設定alert 條件
+  - name: snmp_switch_alerts
+    rules:
+      - alert: SwitchInterfaceOutTrafficHigh
+        expr: ifOutBps > 400000000 # > 400000000 為 filter ，> bool 400000000 才是 1/0
+        for: 5m
+        labels:  # passing to alertmanager 
+          type: switch
+          severity: warning
+        annotations:
+          summary: "交換器 {{ $labels.instance }} 介面 {{ $labels.ifDescr }} 流出流量過高"
+          description: "流出流量為 {{ $value | printf \"%.2f\" }} bps"  # $value=ifOutBps
+```
+
+### 
 
 
 ## snmp_exporter
@@ -232,25 +314,19 @@
     *   使用 Prometheus Query 語法查詢介面流量、狀態等指標，確認數據是否正確收集 (例如 `ifHCOutOctets`, `ifOperStatus`)。
 *   **4.4 Grafana 儀表板：** 導入或創建儀表板來視覺化網路設備數據。
 
-### **五、挑戰與解決方案 (可選)**
+### **五、常見問題 (可選)**
 
-*   **權限問題：** 解決綁定掛載時的資料夾權限問題。
+*   **權限問題：** 解決綁定掛載時的資料夾權限問題()。
 *   **Go 版本衝突：** 解決 generator 運行時 Go 版本過舊或 `go.mod` 格式錯誤的問題。
 *   **SNMP Exporter 配置格式：** 處理新舊版本 `snmp.yml` 格式不相容的問題。
 *   **SNMP MIB 實作差異：** 討論特定設備 (`Zyxel`) 的 `ipAdEntIfIndex` 可能不准確，需調整策略 (例如優先使用 `ifDescr` 作為識別標籤)。
 
-### **六、結論**
-
-*   總結實作成果。
-*   未來展望 (例如：加入 Alertmanager 告警、監控更多 MIBs、擴展到更多設備)。
-
----
-
 ## alertmanager
 
 * ref
-douc
-https://prometheus.io/docs/alerting/latest/configuration/#slack_config
+[douc_github](https://github.com/prometheus/alertmanager/blob/main/docs/configuration.md)
+[douc](https://prometheus.io/docs/alerting/latest/configuration/#slack_config)
+
 
 # snmp docker
 

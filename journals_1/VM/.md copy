@@ -1,0 +1,56 @@
+``` sh
+USAGE:     qm <COMMAND> [ARGS] [OPTIONS]
+
+       qm cloudinit dump <vmid> <type>
+       qm cloudinit pending <vmid>
+       qm cloudinit update <vmid>
+
+       qm disk move <vmid> <disk> [<storage>] [OPTIONS]
+       qm disk resize <vmid> <disk> <size> [OPTIONS]
+       qm disk unlink <vmid> --idlist <string> [OPTIONS]
+       qm disk import <vmid> <source> <storage> [OPTIONS]
+       qm disk rescan  [OPTIONS]
+
+       qm guest cmd <vmid> <command>
+       qm guest exec-status <vmid> <pid>
+       qm guest passwd <vmid> <username> [OPTIONS]
+       qm guest exec <vmid> [<extra-args>] [OPTIONS]
+
+       qm clone <vmid> <newid> [OPTIONS]
+       qm config <vmid> [OPTIONS]
+       qm create <vmid> [OPTIONS]
+       qm delsnapshot <vmid> <snapname> [OPTIONS]
+       qm destroy <vmid> [OPTIONS]
+       qm list  [OPTIONS]
+       qm listsnapshot <vmid>
+       qm migrate <vmid> <target> [OPTIONS]
+       qm pending <vmid>
+       qm reboot <vmid> [OPTIONS]
+       qm reset <vmid> [OPTIONS]
+       qm resume <vmid> [OPTIONS]
+       qm rollback <vmid> <snapname> [OPTIONS]
+       qm sendkey <vmid> <key> [OPTIONS]
+       qm set <vmid> [OPTIONS]
+       qm shutdown <vmid> [OPTIONS]
+       qm snapshot <vmid> <snapname> [OPTIONS]
+       qm start <vmid> [OPTIONS]
+       qm stop <vmid> [OPTIONS]
+       qm suspend <vmid> [OPTIONS]
+       qm template <vmid> [OPTIONS]
+
+       qm cleanup <vmid> <clean-shutdown> <guest-requested>
+       qm import <vmid> <source> --storage <string> [OPTIONS]
+       qm importovf <vmid> <manifest> <storage> [OPTIONS]
+       qm monitor <vmid>
+       qm mtunnel 
+       qm nbdstop <vmid>
+       qm remote-migrate <vmid> [<target-vmid>] <target-endpoint> --target-bridge <string> --target-storage <string> [OPTIONS]
+       qm showcmd <vmid> [OPTIONS]
+       qm status <vmid> [OPTIONS]
+       qm terminal <vmid> [OPTIONS]
+       qm unlock <vmid>
+       qm vncproxy <vmid>
+       qm wait <vmid> [OPTIONS]
+
+       qm help [<extra-args>] [OPTIONS]
+```
