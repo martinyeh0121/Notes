@@ -1,26 +1,4 @@
 
-
-deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
-deb https://enterprise.proxmox.com/debian/ceph-quincy bookworm enterprise
-
-``` sh
-# 註解掉 PVE enterprise source
-sed -i 's|^deb https://enterprise.proxmox.com|# deb https://enterprise.proxmox.com|' /etc/apt/sources.list.d/pve-enterprise.list
-
-# 加入 PVE no-subscription source
-echo "deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription" | sudo tee -a /etc/apt/sources.list
-
-# 修改 Ceph source 為 no-subscription 
-sed -i 's|https://enterprise.proxmox.com|http://download.proxmox.com|g; s|enterprise|no-subscription|g' /etc/apt/sources.list.d/ceph.list
-
-# 更新套件清單
-apt update
-```
-
-[iso_desk](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso)
-[iso_srv](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-live-server-amd64.iso)
-
-
 ``` log
 starting file import from: /var/tmp/pveupload-5b0997f67ccf5c65f74b7bc110946b80
 target node: mbpc220908
@@ -29,8 +7,8 @@ file size is: 2136926208
 command: cp -- /var/tmp/pveupload-5b0997f67ccf5c65f74b7bc110946b80 /var/lib/vz/template/iso/ubuntu-22.04.5-live-server-amd64.iso
 finished file import successfully
 TASK OK
-
 ```
+
 ## setting
 6.x - 2.6 Kernel
 ubuntu-22.04.5-live-server-amd64.iso
@@ -120,7 +98,7 @@ echo "✅ VM $VMID ($VM_NAME) created and started without network config."
 
 # grep -q '^net.ipv4.ip_forward' /etc/sysctl.conf  # (啟用 IP forwarding)
 grep -q '^net.ipv4.ip_forward' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf
-
+sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf
 
 # 網卡名稱（請改成你節點的外網網卡）
 WAN_IFACE="eth0"
@@ -168,4 +146,38 @@ sudo netfilter-persistent save
 
 echo "✅ NAT 設定完成"
 ```
+
+## ssh 免密碼登入
+
+
+
+``` bash
+# 前置設定
+sed -i 's/^#\(PubkeyAuthentication[[:space:]]\+yes[[:space:]].*\)/\1/' /etc/ssh/sshd_config
+sed -i 's/^#\(AuthorizedKeysFile[[:space:]].*\)/\1/' /etc/ssh/sshd_config
+grep -Ei 'PubkeyAuthentication|AuthorizedKeysFile|PermitRootLogin' /etc/ssh/sshd_config
+systemctl restart ssh
+
+## 一般權限不會有問題
+# chmod 700 ~/.ssh
+# chmod 600 ~/.ssh/authorized_keys
+# chown $USER:$USER ~/.ssh -R  # 如果你不是 root 登入時
+
+##
+
+ssh-keygen -f /home/martin/.ssh/id_rsa_mbpc220908 -N ""
+ssh-copy-id -i ./.ssh/id_rsa_mbpc220908 root@192.168.16.62
+ssh -i ~/.ssh/id_rsa_mbpc220908 root@192.168.16.62
+
+
+# /home/martin/.ssh/id_rsa
+# /home/martin/.ssh/id_rsa_mbvm250603
+# /home/martin/.ssh/id_rsa_mbvm250604 
+# /home/martin/.ssh/id_rsa_mbpc220908
+
+
+
+```
+
+
 
