@@ -5,7 +5,7 @@
 
 - 有機會再補上前面步驟！
 
-- 後續操作於 https://${Node_ip}:8006/ 的 UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 、 console (跟 VM 的 console (server 端CLI))
+- 後續操作於 https://<Node_ip>:8006/ 的 UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 、 console (跟 VM 的 console (server 端CLI))
 
 ## 1. 修改 Proxmox VE Node 套件來源（Repository）
 
@@ -54,17 +54,18 @@ apt update
 
 - 於 UI 創建 VM 並配置資源
 
+
+
 - Ubuntu user 設定
 ![alt text](image.png)
 | Ubuntu 安裝欄位          | 範例值         | 顯示在登入提示符的部位         |
 | -------------------- | ----------- | ------------------- |
 | **Your name**        | `test0`     | 不顯示在提示符中（只是帳號描述）    |
-| **Pick a username**  | `mobagel`   | 出現在cli前半 `mobagel@...`   |
 | **Your server name** | `mbvmtest0` | 出現在cli後半 `...@mbvmtest0` |
+| **Pick a username**  | `mobagel`   | 出現在cli前半 `mobagel@...`   |
 
+實際ssh連線使用 ({Pick a username}@{VM_ip}) 進行連線
 
-- 以下未提及 console (vm 之console) 之指令皆預設於 node 之 shell 執行 
-## Proxmox VE 
 
 ### 3.2 自動
 使用 cil script (還沒調好，script能完成 vm 建立 + ubuntu 安裝)
@@ -135,13 +136,13 @@ qm start $VMID
 echo "✅ VM $VMID ($VM_NAME) created and started without network config."
 ```
 
-## ubuntu 安裝 (console)
+
 
 ## ssh 設定
 ``` sh
 qm set 100 --sshkey /root/.ssh/id_rsa.pub
 qm cloudinit update 100
-qm set 100 --ciuser mbvm250603
+qm set 100 --ciuser "$Username"
 qm reboot 100
 ssh -i ~/.ssh/id_rsa mbvm250603@192.168.16.63 # ssh連線
 # ssh -i ~/.ssh/id_rsa mbvm250604@192.168.16.64
