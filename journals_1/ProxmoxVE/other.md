@@ -165,9 +165,9 @@ systemctl restart ssh
 
 ##
 
-ssh-keygen -f /home/martin/.ssh/id_rsa_mbpc220908 -N ""
-ssh-copy-id -i ./.ssh/id_rsa_mbpc220908 root@192.168.16.62
-ssh -i ~/.ssh/id_rsa_mbpc220908 root@192.168.16.62
+ssh-keygen -f ~/.ssh/id_rsa_<hostname> -N ""
+ssh-copy-id -i ~/.ssh/id_rsa_<hostname> root@192.168.16.62
+ssh -i ~/.ssh/id_rsa_<hostname> root@192.168.16.62
 
 
 # /home/martin/.ssh/id_rsa

@@ -1,0 +1,13 @@
+ufw
+
+proxy / dhcp (practice)
+
+庫存管理系統 docker-compose(後: django, 前:   , db: postgres)
+
+
+系統碟遷移  (下周盡快)
+
+
+下周一約時間 (Davis / Wennie) (Ken report)
+
+Brian n8n zip & how to build

@@ -5,15 +5,32 @@
 
 - 有機會再補上前面步驟！
 
-- 後續操作於 https://<Node_ip>:8006/ 的 UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 、 console (跟 VM 的 console (server 端CLI))
+- 後續操作皆於 https://<Node_ip>:8006/ 的 
+UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 跟 console (VM 的 console (server 端CLI))
+
+  - CLI 開啟方式: 在 UI 左側樹狀圖中找到目標 Node，右上 "Shell" 展開
+  - console 開啟方式: 在 UI 左側樹狀圖中找到目標 VM，右上 ""
 
 ## 1. 修改 Proxmox VE Node 套件來源（Repository）
 
 Proxmox VE 預設使用需付費訂閱的 enterprise 軟體來源。若系統未啟用有效訂閱，更新套件時可能出現錯誤或提示訊息。為了正常使用更新功能，建議改用官方提供的 no-subscription（免費）來源。
+(URIs / Suites 類型可能不同，請視自己的情況修改，)
 
-### 1.1 手動修改方式
+### 1.1 手動修改 (UI)
+
+依序展開 Node > Updates > Repositories ， 選擇 "Add"
+
+依次選擇以下來源： 
+1. no-subscription
+2. Ceph Quincy 或 Ceph Reef（擇一，皆為 no-subscription）
+
+選擇原先 enterprise 來源 (如 https://enterprise.proxmox.com/debian/ceph-quincy)， 選擇 "Disable"
+
+展開 Node > Sheel，輸入 apt update 套用來源
+
+### 1.1.2 手動修改方式 (CLI)
 ``` sh
-# 編輯 Ceph 軟體來源
+# 編輯 Ceph 軟體來源 
 nano /etc/apt/sources.list.d/ceph.list
 # 將以下內容：
 # deb https://enterprise.proxmox.com/debian/ceph-quincy bookworm enterprise
@@ -30,7 +47,7 @@ deb http://download.proxmox.com/debian/pve bookworm pve-no-subscription
 # 更新 APT 套件清單
 apt update
 ```
-### 1.2 自動化腳本（.bash）
+### 1.1.3 自動化腳本（.bash）
 ``` bash
 # 修改 PVE source 為 no-subscription 
 sed -i 's|https://enterprise.proxmox.com|http://download.proxmox.com|g; s|enterprise|no-subscription|g' /etc/apt/sources.list.d/pve-enterprise.list
@@ -41,8 +58,11 @@ sed -i 's|https://enterprise.proxmox.com|http://download.proxmox.com|g; s|enterp
 apt update
 ```
 
+### 1.2 完成後確認 Node 成功啟用
+
 ## 2. 至 Ubuntu 官網下載 iso
-[iso_desk](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso)
+
+本範 ubuntu 版本為 ubuntu-22.04.5 [iso_desk](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-desktop-amd64.iso)
  / [iso_srv](https://releases.ubuntu.com/jammy/ubuntu-22.04.5-live-server-amd64.iso)
 
 本範例下載 server 版本: ubuntu-22.04.5-live-server-amd64.iso
@@ -53,16 +73,15 @@ apt update
 ### 3.1 手動
 
 - 於 UI 創建 VM 並配置資源
-
-
-
-- Ubuntu user 設定
+  - Node 右鍵點選 → 選擇 "Shell"
+- Ubuntu  安裝 user 設定
 ![alt text](image.png)
 | Ubuntu 安裝欄位          | 範例值         | 顯示在登入提示符的部位         |
 | -------------------- | ----------- | ------------------- |
 | **Your name**        | `test0`     | 不顯示在提示符中（只是帳號描述）    |
 | **Your server name** | `mbvmtest0` | 出現在cli後半 `...@mbvmtest0` |
 | **Pick a username**  | `mobagel`   | 出現在cli前半 `mobagel@...`   |
+  - 以上 VM 登入使用 mobagel 作為 username，且三種名稱與
 
 實際ssh連線使用 ({Pick a username}@{VM_ip}) 進行連線
 
@@ -222,7 +241,7 @@ sudo ip addr add .168.1.100/24 dev enp6s18
 sudo ip route add 0.0.0.0/0 via 172.23.0.1  # 等效(===) default via 172.23.0.1 dev enp6s18
 sudo ip addr del 192.168.16.28/24 dev enp6s18
 
-# sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
+sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
 network:
     version: 2
     ethernets:
@@ -240,12 +259,14 @@ network:
                     - 8.8.4.4
 
 ```
+sudo netplan apply
+sudo systemctl restart networking
 
 
 透過 Proxmox 網頁介面設定（推薦）
 登入 Proxmox VE 的 Web 界面（通常是 https://你的PVE_IP:8006）
 
-選擇虛擬機（QM）> Hardware > Network Device (點選 Edit 編輯)
+選擇虛擬機（VM）> Hardware > Network Device (點選 Edit 編輯)
 ![alt text](image-1.png)
 「Bridge」欄位 改成 Node 新增的網卡 (我的是vmbr1)
 ![alt text](image-2.png)

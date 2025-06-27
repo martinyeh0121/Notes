@@ -4,6 +4,11 @@
 這裡彙整了本專案的各類技術筆記，方便快速導覽與查閱。
 
 ## 目錄
+- [日誌](/journal/journal.md)
+
+- [todo](/journal/todos.txt)
+
+
 - [Proxmox VE 熟悉實作](journals_1/ProxmoxVE/panel.md)
   
 - [Prometheus 網路監控實作手冊](journals_0/project/monitoring/switch_observation/prometheus.md)

@@ -1,0 +1,10 @@
+Host mbvm000
+    HostName 192.168.16.0
+    User mobagel
+    IdentityFile /home/martin/.ssh/id_rsa_mbvm000
+
+Host mbvm001
+    HostName 192.168.16.1
+    User mobagel
+    IdentityFile /home/martin/.ssh/id_rsa_mbvm001
+
