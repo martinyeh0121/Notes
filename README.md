@@ -4,12 +4,13 @@
 這裡彙整了本專案的各類技術筆記，方便快速導覽與查閱。
 
 ## 目錄
-- [日誌](/journal/journal.md)
+- [Proxmox VE](journals_1/ProxmoxVE/panel.md) 點我!
+
+- [日誌](/journal/journal.md) 點我!
 
 - [todo](/journal/todos.txt)
 
-
-- [Proxmox VE 熟悉實作](journals_1/ProxmoxVE/panel.md)
+- [OPE_request](/journals_0/project/協助表單/manual.md)
   
 - [Prometheus 網路監控實作手冊](journals_0/project/monitoring/switch_observation/prometheus.md)
   - 內容涵蓋 Prometheus、Grafana、SNMP Exporter 的架構、安裝、設定與常見問題，適合網路監控新手與進階使用者參考。

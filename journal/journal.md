@@ -7,11 +7,10 @@
 | 20250627 | SSH 免密碼登入 batch-script | ✅ |  |      |     | [here](/journals_1/ProxmoxVE/other.md#ssh-免密碼登入) [bash](/journals_1/ProxmoxVE/scripts/ssh/)   |
 | 20250627 | 日誌試做  | 🔄 |    |    |      | here   |
 | 20250627 | proxy server  | ⏳ |    |    |      | []()   |
-| 20250627 | PVE mount disk | ⏳ |    |    | -> 系統碟轉移  | here   |
-| 20250627 | 
+| 20250627 | PVE mount disk |  |    |    | -> 系統碟轉移  | here   |
 
-| 20250627 | 日誌試做  | 🔄 |    |    |      | here   |
-| 20250627 | 日誌試做  | 🔄 |    |    |      | here   |
 
+| 20250630 | OPE_request sync |  |    |    |      | here   |
+| 20250630 | vzdump / PVE mount disk (fdisk +  + ) |  |    |    |      | here   |
 
 ✅: 完成 , ⏳: 未完成 , 🔄: 持續調整 daily routine

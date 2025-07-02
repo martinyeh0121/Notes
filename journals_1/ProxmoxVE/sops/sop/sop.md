@@ -10,6 +10,10 @@ UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 跟 console (VM 的 console (server 
 
   - CLI 開啟方式: 在 UI 左側樹狀圖中找到目標 Node，右上 "Shell" 展開
   - console 開啟方式: 在 UI 左側樹狀圖中找到目標 VM，右上 ""
+  
+  **VM 端**: 強烈建議使用[ssh](#4-ssh-設定) [免密碼](/journals_1/ProxmoxVE/other.md#ssh-免密碼登入)
+            (ubuntu OS 安裝時設定為佳, 使用建議 *localhost* -ssh- *PVE Node* -ssh- *VM on the Node*) 
+
 
 ## 1. 修改 Proxmox VE Node 套件來源（Repository）
 
@@ -74,16 +78,22 @@ apt update
 
 - 於 UI 創建 VM 並配置資源
   - Node 右鍵點選 → 選擇 "Shell"
-- Ubuntu  安裝 user 設定
-![alt text](image.png)
-| Ubuntu 安裝欄位          | 範例值         | 顯示在登入提示符的部位         |
-| -------------------- | ----------- | ------------------- |
-| **Your name**        | `test0`     | 不顯示在提示符中（只是帳號描述）    |
-| **Your server name** | `mbvmtest0` | 出現在cli後半 `...@mbvmtest0` |
-| **Pick a username**  | `mobagel`   | 出現在cli前半 `mobagel@...`   |
-  - 以上 VM 登入使用 mobagel 作為 username，且三種名稱與
 
-實際ssh連線使用 ({Pick a username}@{VM_ip}) 進行連線
+- Ubuntu 安裝 user 設定
+![alt text](image.png)
+
+  | Ubuntu 安裝欄位      | 範例值       | 顯示在登入提示符的部位   |
+  | -------------------- | ----------- | ---------------------------- |
+  | **Your name**        | `test0`     | 不顯示在提示符中（只是帳號描述）|
+  | **Your server name** | `mbvmtest0` | 出現在cli後半 `...@mbvmtest0` |
+  | **Pick a username**  | `mobagel`   | 出現在cli前半 `mobagel@...`   |
+
+  - 此範例中，Ubuntu VM 使用 mobagel 作為 OS 的 username，且實際ssh連線使用 ({Pick a username}@{VM_ip}) 進行連線
+
+- Ubuntu 安裝 ssh 設定
+
+
+
 
 
 ### 3.2 自動
@@ -157,7 +167,24 @@ echo "✅ VM $VMID ($VM_NAME) created and started without network config."
 
 
 
-## ssh 設定
+## 4. ssh 設定
+
+- 如果安裝 ubuntu 時未同時安裝openssh-server，需使用console 於 VM 安裝 openssh-server，完成後方能用 ssh 指令連線
+``` sh
+sudo apt update
+sudo apt install openssh-server
+sudo systemctl enable --now ssh
+```
+
+
+
+### 4.1 ssh 免密碼登入
+
+- 本地 ssh 方法
+
+[ssh-免密碼登入](/journals_1/ProxmoxVE/other.md#ssh-免密碼登入)
+
+- Node Shell ssh 連線方法
 ``` sh
 qm set 100 --sshkey /root/.ssh/id_rsa.pub
 qm cloudinit update 100
@@ -166,24 +193,71 @@ qm reboot 100
 ssh -i ~/.ssh/id_rsa mbvm250603@192.168.16.63 # ssh連線
 # ssh -i ~/.ssh/id_rsa mbvm250604@192.168.16.64
 ```
+ 
 
-### 如iso設定時未安裝openssh-server ()
-- 使用console 於 VM 安裝 openssh-server，完成後方能用 ssh 指令連線
-``` sh
-sudo apt update
-sudo apt install openssh-server
-sudo systemctl enable --now ssh
-```
 
-## 網路拓樸調整
+## 5. 練習: 網路拓樸調整
 - 網路拓樸
 ![alt text](routing.jpg)
   - v0 預設      
 
-sysctl -w net.ipv4.ip_forward=1
+#### 5.1 設定 NAT，啟用 ip 轉發
+
+1. 暫時
+``` sh
+sysctl -w net.ipv4.ip_forward=1 # 此為暫時
+```
 
 
-修改node nano /etc/network/interfaces
+  ``` sh
+  192.168.16.62 / 172.23.0.1 (host):
+ 
+  
+
+  # -----------------------------------------
+
+  # iptables -t nat -A POSTROUTING -s 172.23.0.0/24 -o vmbr0 -j MASQUERADE
+  sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf
+
+
+  # 192.168.16.63 (srv1):
+
+  sudo ip route add default via 192.168.16.62
+  # sudo ip route add 172.23.0.0/24 via 192.168.16.62
+
+  # 192.168.16.28 (srv2):
+
+  ip sudo ip route add 172.23.0.0/24 via 192.168.16.62
+  sudo ip addr add .168.1.100/24 dev enp6s18
+  sudo ip route add 0.0.0.0/0 via 172.23.0.1  # 等效(===) default via 172.23.0.1 dev enp6s18
+  sudo ip addr del 192.168.16.28/24 dev enp6s18
+
+  sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
+  network:
+      version: 2
+      ethernets:
+          enp6s18:
+              dhcp4: no
+              addresses:
+                  - 172.23.0.100/24
+          #     gateway4: 172.23.0.1
+              routes:
+                  - to: default
+                    via: 172.23.0.1
+              nameservers:
+                  addresses:
+                      - 8.8.8.8
+                      - 8.8.4.4
+
+  ```
+  sudo netplan apply
+  sudo systemctl restart networking
+
+
+
+
+- 修改 Node Shell 新增 vmbr 虛擬網卡: 
+nano /etc/network/interfaces
 ``` sh
 auto lo
 iface lo inet loopback
@@ -221,46 +295,6 @@ root@mbpc220908:~# ip a | grep "vmbr"
 32: vmbr1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
     inet 172.23.0.1/24 scope global vmbr1
 ```
-
-- 1. 設定NAT 處理 內外網ip 轉換
-暫時:
-``` sh
-192.168.16.62 / 172.23.0.1 (host):
-
-# iptables -t nat -A POSTROUTING -s 172.23.0.0/24 -o vmbr0 -j MASQUERADE
-sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf
-# 192.168.16.63 (srv1):
-
-sudo ip route add default via 192.168.16.62
-# sudo ip route add 172.23.0.0/24 via 192.168.16.62
-
-# 192.168.16.28 (srv2):
-
-ip sudo ip route add 172.23.0.0/24 via 192.168.16.62
-sudo ip addr add .168.1.100/24 dev enp6s18
-sudo ip route add 0.0.0.0/0 via 172.23.0.1  # 等效(===) default via 172.23.0.1 dev enp6s18
-sudo ip addr del 192.168.16.28/24 dev enp6s18
-
-sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
-network:
-    version: 2
-    ethernets:
-        enp6s18:
-            dhcp4: no
-            addresses:
-                - 172.23.0.100/24
-        #     gateway4: 172.23.0.1
-            routes:
-                - to: default
-                  via: 172.23.0.1
-            nameservers:
-                addresses:
-                    - 8.8.8.8
-                    - 8.8.4.4
-
-```
-sudo netplan apply
-sudo systemctl restart networking
 
 
 透過 Proxmox 網頁介面設定（推薦）
