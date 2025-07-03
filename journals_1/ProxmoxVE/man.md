@@ -54,7 +54,29 @@ USAGE:     qm <COMMAND> [ARGS] [OPTIONS]
        qm wait <vmid> [OPTIONS]
 
        qm help [<extra-args>] [OPTIONS]
+
+
+# disk
+
+# local
+pvesm alloc local 100 qcow2 10G
+
+
+
+qm set <vmid> -<interface><index> <storage>:<size>
+qm set 100 -scsi1 local-lvm:10G
+qm set 100 -scsi1 local:10G
+qm set <vmid> -delete <interface><index>
+
+
+# local-lvm
+pvesm remove <storage>:<diskname>
+pvesm remove local-lvm:vm-100-disk-1
+
+qm set 702 -delete scsi1
+
 ```
+
 
 ## iptable
 

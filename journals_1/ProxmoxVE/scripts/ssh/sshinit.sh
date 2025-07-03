@@ -1,6 +1,6 @@
 USER_HOST=$1 # "mobagel@192.168.16.62"
 KEY_NAME=$2 # "mbvm250603"
-WORKDIR=$3 # "目前目錄，可選"
+WORKDIR=$3 # "執行目錄，可選"
 PASSWORD=$4 # "密碼，可選"
 
 if [ -n "$WORKDIR" ]; then

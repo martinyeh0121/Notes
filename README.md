@@ -4,11 +4,11 @@
 這裡彙整了本專案的各類技術筆記，方便快速導覽與查閱。
 
 ## 目錄
-- [Proxmox VE](journals_1/ProxmoxVE/panel.md) 點我!
+- [日誌](/journal/journal.md) **<--**
 
-- [日誌](/journal/journal.md) 點我!
+- [todo](/journal/todos.txt) **<--**
 
-- [todo](/journal/todos.txt)
+- [Proxmox VE penal](journals_1/ProxmoxVE/panel.md) **<--**
 
 - [OPE_request](/journals_0/project/協助表單/manual.md)
   

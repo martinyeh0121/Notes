@@ -1,17 +1,22 @@
+# 實體資料搬移 / 備份
 
 
 Ref:
 
 [PVE douc.](https://pve.proxmox.com/pve-docs/chapter-vzdump.html) (https://<urPVEserver>/pve-docs/chapter-vzdump.html) 
-LVM — pv, vg, lv
-[動態的分配檔案系統的空間，方便管理者隨時調整空間，達到妥善使用硬體效能的目的!](https://sean22492249.medium.com/lvm-pv-vg-lv-1777a84a3ce8)
+
+[LVM — pv, vg, lv!](https://sean22492249.medium.com/lvm-pv-vg-lv-1777a84a3ce8)
+
 gpt
 
+script:
+
+[scripts](/journals_1/ProxmoxVE/scripts/disk/home/)
 
 
-# OP0: 直接 copy (qemu-img: 根據虛擬硬碟實際用的space, dd: 逐bit copy)
+## Ver01: 直接 copy (qemu-img: 根據虛擬硬碟實際用的space, dd: 逐bit copy)
 
-Node端:
+1. Node端:
 
 ``` sh
 # 1. 建立目標 VM 映像目錄（如果還沒建立）
@@ -27,19 +32,20 @@ ls -lh /var/lib/vz/images/121/
 qm set 121 -scsi1 local:121/vm-110-disk-2.qcow2
 ```
 
-VM 端:
+2. VM 端:
 
 ``` bash
 ssh mbvmtest0 #
 
-## 前置檢查指令
+## 0. 前置檢查指令 (選1)
 lsblk                        # 查看系統目前的磁碟與分割區（確認 sdb1 存在）
-sudo fdisk -l /dev/sd*       # 檢查 /dev/sdb 分割表與格式資訊（確保 sdb1 有格式化）
+sudo fdisk -l /dev/sd[a-z]      # 檢查 /dev/sdb 分割表與格式資訊（確保 sdb1 有格式化）
 
 ## mount
-sudo mkdir -p /mnt/sdb       # 建立掛載點資料夾（如果不存在就一起建立）
+sudo mkdir -p /mnt/sdb       # 建立 mount point
 sudo mount /dev/sdb1 /mnt/sdb  # 將 /dev/sdb1 分割區掛載到 /mnt/sdb 資料夾
-df -h /mnt/sdb               # 確認磁碟是否成功掛載並查看使用情況
+
+df -h /mnt/sdb               # 確認是否成功掛載
 ls /mnt/sdb                  # 檢查掛載後資料夾中是否有內容（驗證是否正常讀寫）
 
 ## check

@@ -7,10 +7,18 @@
 | 20250627 | SSH 免密碼登入 batch-script | ✅ |  |      |     | [here](/journals_1/ProxmoxVE/other.md#ssh-免密碼登入) [bash](/journals_1/ProxmoxVE/scripts/ssh/)   |
 | 20250627 | 日誌試做  | 🔄 |    |    |      | here   |
 | 20250627 | proxy server  | ⏳ |    |    |      | []()   |
-| 20250627 | PVE mount disk |  |    |    | -> 系統碟轉移  | here   |
+| 20250630 | PVE VM 轉移 vzdump | ☑️ |    |    |      | here   |
+| 20250627 | PVE mount disk (Linux) | ☑️ |   |    | -> 系統碟轉移  | here   |
+| 20250630 | OPE_request sync | ☑️ |    |    |    | [here](/journals_0/project/協助表單/manual.md)   |
+| 20250702 | PVE 資料碟轉移/備份 (qcow2) | ☑️ |    |    |   | [here](/journals_1/ProxmoxVE/sops/sop2/sop2.md)   |
+| 20250703 | PVE 資料碟轉移 (預計dd) | ⏳ |    |    |   | here   |
+| 20250703 | PVE disk cli 操作 | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/man.md#) |
+| 20250703 | SSH 腳本 | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/man.md#) |
+| 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   |
+
+<!-- | 20  | 工作內容             | 任務狀態 | 遇到的問題      | 解決方式 / 備註   |  備註2  | Link  |-->
 
 
-| 20250630 | OPE_request sync |  |    |    |      | here   |
-| 20250630 | vzdump / PVE mount disk (fdisk +  + ) |  |    |    |      | here   |
 
 ✅: 完成 , ⏳: 未完成 , 🔄: 持續調整 daily routine
+☑️: 手冊待調整

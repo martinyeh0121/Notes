@@ -8,3 +8,20 @@ proxy / dhcp (practice)
 系統碟遷移 資料碟遷移 
 
 To Brian, n8n zip & how to build
+
+pve Host 開機
+
+disk migration notify
+
+bakeup stragedy 異機地
+
+it facility: temperature (cool)  ... 
+
+network tropology
+
+參數化 -> 互動式
+
+...
+
+
+cloudinit
