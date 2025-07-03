@@ -27,12 +27,12 @@ ssh -t "$SSH_TARGET" bash -c "'
 
   echo \"掛載磁碟區 \$PARTITION 到 \$MOUNT_POINT...\"
   sudo mount \$PARTITION \$MOUNT_POINT
-
+cd
   echo \"掛載結果：\"
   df -h \$MOUNT_POINT
   ls \$MOUNT_POINT
 
-  echo \"建立測試檔案 omg.txt...\"
-  echo \"這是測試內容\" | sudo tee \$MOUNT_POINT/omg.txt
+  echo \"建立測試檔案 test.txt...\"
+  echo \"這是測試內容\" | sudo tee \$MOUNT_POINT/test.txt
   echo \"✅ 完成掛載並建立檔案。\"
 '"

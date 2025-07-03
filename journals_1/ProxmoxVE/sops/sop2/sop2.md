@@ -41,14 +41,23 @@ ssh mbvmtest0 #
 lsblk                        # 查看系統目前的磁碟與分割區（確認 sdb1 存在）
 sudo fdisk -l /dev/sd[a-z]      # 檢查 /dev/sdb 分割表與格式資訊（確保 sdb1 有格式化）
 
-## mount
+## 1. mount
 sudo mkdir -p /mnt/sdb       # 建立 mount point
 sudo mount /dev/sdb1 /mnt/sdb  # 將 /dev/sdb1 分割區掛載到 /mnt/sdb 資料夾
+
+# 取得 UUID
+UUID=$(sudo blkid -s UUID -o value "$PARTITION")
+
+# 備份並修改 /etc/fstab
+echo "👉 設定 /etc/fstab 自動掛載..."
+sudo cp /etc/fstab /etc/fstab.bak
+sudo sed -i "\|$MOUNT_POINT|d" /etc/fstab  # 移除舊的掛載記錄（相同掛載點）
+echo "UUID=$UUID  $MOUNT_POINT  ext4  defaults  0  2" | sudo tee -a /etc/fstab
 
 df -h /mnt/sdb               # 確認是否成功掛載
 ls /mnt/sdb                  # 檢查掛載後資料夾中是否有內容（驗證是否正常讀寫）
 
-## check
+## 2. check
 
 sudo nano /mnt/sdb/omg.txt
 

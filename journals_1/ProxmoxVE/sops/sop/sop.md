@@ -1,7 +1,6 @@
-
 # ProxmoxVE VM 建置 (以 Ubuntu 為例)
 
-## 0. ~ 建立 Proxmox VE Node account & 設置路由   & 前言 
+## 0. ~ Proxmox VE Node account 建立完畢 & 設置路由   & 前言 
 
 - 有機會再補上前面步驟！
 
@@ -10,7 +9,7 @@ UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 跟 console (VM 的 console (server 
 
   - CLI 開啟方式: 在 UI 左側樹狀圖中找到目標 Node，右上 "Shell" 展開
   - console 開啟方式: 在 UI 左側樹狀圖中找到目標 VM，右上 ""
-  
+  dependency
   **VM 端**: 強烈建議使用[ssh](#4-ssh-設定) [免密碼](/journals_1/ProxmoxVE/other.md#ssh-免密碼登入)
             (ubuntu OS 安裝時設定為佳, 使用建議 *localhost* -ssh- *PVE Node* -ssh- *VM on the Node*) 
 
@@ -200,64 +199,54 @@ ssh -i ~/.ssh/id_rsa mbvm250603@192.168.16.63 # ssh連線
 - 網路拓樸
 ![alt text](routing.jpg)
   - v0 預設      
+  - [v1](#v1-靜態-ip-設定)
+  - v2 (等dhcp)
 
-#### 5.1 設定 NAT，啟用 ip 轉發
+### 0. 概念補充 (可略)
 
-1. 暫時
-``` sh
-sysctl -w net.ipv4.ip_forward=1 # 此為暫時
+- metric (Linux 網路架構):
+  - metric 是用來表示路由的「優先順序」。
+
+  - 數字越小，優先權越高。
+
+  - 當有多條相同目標（如 default）的路由時，系統會選擇 metric 最小的那一條。
+
+  | Metric 值    | 用途/意義               | 備註                  |
+  | ----------- | ------------------- | ------------------- |
+  | **0**       | 最高優先權（絕對最先選）        | 通常不用這麼低，除非明確要強制使用某條 |
+  | **1–99**    | 高優先權                | 常用於靜態路由、手動設定        |
+  | **100**     | 預設值（若無特別指定）         | 很多 DHCP 路由預設是這個     |
+  | **200–300** | 備援路由、高優先權的 fallback | 通常手動用來做自動備援切換       |
+  | **500+**    | 極低優先權，當成「備胎」或除錯用途   | 幾乎永遠不會被選上，除非其他全部掛掉  |
+
+### v1 靜態 ip 設定  
+
+#### 192.168.16.62 / 172.23.0.1 (host):
+
+1. IP forwarding
+
+- 確保 Linux 核心開啟 IPv4 封包轉送。
+
+``` bash
+sysctl -w net.ipv4.ip_forward=1 # 暫時
+sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf # 永久，這裡用指令調整 /etc/sysctl.conf 設定
 ```
 
+2. 設定 NAT 規則
 
-  ``` sh
-  192.168.16.62 / 172.23.0.1 (host):
- 
-  
+- 允許從 172.23.0.0/24 子網發出的封包，經由 vmbr0 介面（通常是主機對外的橋接介面）送出時進行 IP 位址偽裝（MASQUERADE）。
 
-  # -----------------------------------------
+``` bash
+iptables -t nat -A POSTROUTING -s 172.23.0.0/24 -o vmbr0 -j MASQUERADE
+```
 
-  # iptables -t nat -A POSTROUTING -s 172.23.0.0/24 -o vmbr0 -j MASQUERADE
-  sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf || echo 'net.ipv4.ip_forward=1' | tee -a /etc/sysctl.conf
+- 效果：讓主機可以轉發從一個介面收到的 IP 封包到另一個介面 —— 就像路由器一樣運作。
 
+3. 新增 vmbr 虛擬網卡: 
 
-  # 192.168.16.63 (srv1):
+- 編輯設定檔 (nano /etc/network/interfaces)，加入 vmbr1 虛擬網卡 (內網)：
+  此 host vmbr0 連接 192.168.16.1 (通常是自己的 router)
 
-  sudo ip route add default via 192.168.16.62
-  # sudo ip route add 172.23.0.0/24 via 192.168.16.62
-
-  # 192.168.16.28 (srv2):
-
-  ip sudo ip route add 172.23.0.0/24 via 192.168.16.62
-  sudo ip addr add .168.1.100/24 dev enp6s18
-  sudo ip route add 0.0.0.0/0 via 172.23.0.1  # 等效(===) default via 172.23.0.1 dev enp6s18
-  sudo ip addr del 192.168.16.28/24 dev enp6s18
-
-  sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
-  network:
-      version: 2
-      ethernets:
-          enp6s18:
-              dhcp4: no
-              addresses:
-                  - 172.23.0.100/24
-          #     gateway4: 172.23.0.1
-              routes:
-                  - to: default
-                    via: 172.23.0.1
-              nameservers:
-                  addresses:
-                      - 8.8.8.8
-                      - 8.8.4.4
-
-  ```
-  sudo netplan apply
-  sudo systemctl restart networking
-
-
-
-
-- 修改 Node Shell 新增 vmbr 虛擬網卡: 
-nano /etc/network/interfaces
 ``` sh
 auto lo
 iface lo inet loopback
@@ -266,45 +255,127 @@ iface enp5s0 inet manual
 
 auto vmbr0
 iface vmbr0 inet static
-        address 192.168.16.62/24
+        address 192.168.16.XX/24
         gateway 192.168.16.1
         bridge-ports enp5s0
         bridge-stp off
         bridge-fd 0
 
-## 新增網卡 vmbr1
 auto vmbr1
 iface vmbr1 inet static
-        address 172.23.0.1/24
-#        gateway 172.23.0.1  
-        bridge-ports none  
-        bridge-stp off
-        bridge-fd 0
+    address 172.23.0.1/24
+    bridge-ports none
+    bridge-stp off
+    bridge-fd 0
 
 source /etc/network/interfaces.d/*
 ```
 
-- 改完重啟網卡，確認vmbr1 成功新增
-``` bash
-root@mbpc220908:~# systemctl restart networking
+4. 改完，確認 vmbr1 成功新增
 
-root@mbpc220908:~# ip a | grep "vmbr"
+``` bash
+systemctl restart networking # 重啟驅動
+
+ip a | grep "vmbr" # 檢查指令
+```
+- 範例輸出
 2: enp5s0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq master vmbr0 state UP group default qlen 1000
 31: vmbr0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP group default qlen 1000
-    inet 192.168.16.62/24 scope global vmbr0
+    inet 192.168.16.XX/24 scope global vmbr0
 32: vmbr1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UNKNOWN group default qlen 1000
     inet 172.23.0.1/24 scope global vmbr1
+
+#### 192.168.16.63 (srv1): 
+
+``` sh
+  # 1. 修改 gateway
+  
+  sudo ip route add default via 192.168.16.62 # 暫時
+  
+  # 永久 (Netplan 設定檔，通常在 /etc/netplan/ 下，如 01-netcfg.yaml)
+  sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
+  # 修改設定檔，調整/新增 routes 設定，此次 gateway 改為 192.168.16.62 (metric: 路由優先度)
+  network:
+    ethernets:
+        enp6s18:
+            dhcp4: true
+            # dhcp4-overrides:     # 預設 metric 是100，可調整
+            #   route-metric: 200 
+            routes:
+              - to: 0.0.0.0/0
+                via: 192.168.16.62
+                metric: 50
+    version: 2
+
+  # 2. 套用設定
+  sudo netplan apply
+  # WARNING:root:Cannot call Open vSwitch: ovsdb-server.service is not running. # 可略，除非你真的要用 Open vSwitch(OVS)
+
 ```
 
+### 192.168.16.28 (srv2) 設定為 172.23.0.100
 
-透過 Proxmox 網頁介面設定（推薦）
-登入 Proxmox VE 的 Web 界面（通常是 https://你的PVE_IP:8006）
+#### 1. 臨時設定（立即生效，重開機會消失）
 
-選擇虛擬機（VM）> Hardware > Network Device (點選 Edit 編輯)
-![alt text](image-1.png)
+```bash
+# 新增 172.23.0.2/24 IP 到網卡
+sudo ip addr add 172.23.0.2/24 dev enp6s18
+
+# 設定預設路由為 172.23.0.1 ，等效(===) default via 172.23.0.
+sudo ip route add default via 172.23.0.1 dev enp6s18
+```
+
+---
+
+#### 2. 永久設定（Netplan 設定檔）
+
+1. 編輯 Netplan 設定檔（檔名依實際情況調整，通常在 `/etc/netplan/` 下）：
+
+    ```bash
+    sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
+    ```
+
+2. 內容範例（將 enp6s18 設定為靜態 IP 172.23.0.100/24，並指定 gateway 與 DNS）：
+
+    ```yaml
+    network:
+      version: 2
+      ethernets:
+        enp6s18:
+          dhcp4: no
+          addresses:
+            - 172.23.0.100/24
+          routes:
+            - to: default
+              via: 172.23.0.1
+          nameservers:
+            addresses:
+              - 8.8.8.8
+              - 8.8.4.4
+    ```
+
+3. 套用設定：
+
+    ```bash
+    sudo netplan apply
+    sudo systemctl restart networking
+    ```
+
+---
+
+#### 3. Proxmox VE 網頁介面設定（推薦）
+
+1. 登入 Proxmox VE Web 介面（通常是 https://你的PVE_IP:8006）
+2. 選擇虛擬機（VM）> Hardware > Network Device，點選 Edit 編輯 ![alt text](image-1.png)
+3. 「Bridge」欄位選擇主機新增的網卡（如 vmbr1）
+
+---
+
+
 「Bridge」欄位 改成 Node 新增的網卡 (我的是vmbr1)
 ![alt text](image-2.png)
 
+### v2 動態 ip 設定 (dhcp)
 ##
 
 

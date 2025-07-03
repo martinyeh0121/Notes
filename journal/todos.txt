@@ -13,7 +13,7 @@ pve Host 開機
 
 disk migration notify
 
-bakeup stragedy 異機地
+bakeup stragedy 異機 / 地
 
 it facility: temperature (cool)  ... 
 
@@ -25,3 +25,20 @@ network tropology
 
 
 cloudinit
+
+動態 snapshot(持續輸入)
+
+
+
+rsa
+ssh
+
+template 版號
+
+
+OS release 
+
+autoinstall
+
+
+selinux
