@@ -8,7 +8,7 @@
 
 - [todo](/journal/todos.txt) **<--**
 
-- [Proxmox VE penal](journals_1/ProxmoxVE/panel.md) **<--**
+- [Proxmox VE penal](journals_1/ProxmoxVE/README.md) **<--**
 
 - [OPE_request](/journals_0/project/協助表單/manual.md)
   

@@ -331,35 +331,35 @@ sudo ip route add default via 172.23.0.1 dev enp6s18
 
 1. 編輯 Netplan 設定檔（檔名依實際情況調整，通常在 `/etc/netplan/` 下）：
 
-    ```bash
-    sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
-    ```
+  ```bash
+  sudo nano /etc/netplan/$(ls /etc/netplan/ | head -n 1)
+  ```
 
 2. 內容範例（將 enp6s18 設定為靜態 IP 172.23.0.100/24，並指定 gateway 與 DNS）：
 
-    ```yaml
-    network:
-      version: 2
-      ethernets:
+  ```yaml
+  network:
+    version: 2
+    ethernets:
         enp6s18:
-          dhcp4: no
-          addresses:
-            - 172.23.0.100/24
-          routes:
-            - to: default
-              via: 172.23.0.1
-          nameservers:
+            dhcp4: no
             addresses:
-              - 8.8.8.8
-              - 8.8.4.4
-    ```
+                - 172.23.0.100/24
+        #     gateway4: 172.23.0.1
+            routes:
+                - to: default
+                  via: 172.23.0.1
+            nameservers:
+                addresses:
+                    - 8.8.8.8
+                    - 8.8.4.4
 
 3. 套用設定：
 
-    ```bash
-    sudo netplan apply
-    sudo systemctl restart networking
-    ```
+  ```bash
+  sudo netplan apply
+  sudo systemctl restart networking
+  ```
 
 ---
 

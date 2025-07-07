@@ -11,20 +11,21 @@ To Brian, n8n zip & how to build
 
 pve Host 開機
 
-disk migration notify
+disk migration notification
 
-bakeup stragedy 異機 / 地
-
-it facility: temperature (cool)  ... 
+IT facility: temperature (cool)  ... 
 
 network tropology
 
 參數化 -> 互動式
 
+
+bakeup stragedy 異機 / 地
+
 ...
 
 
-cloudinit
+
 
 動態 snapshot(持續輸入)
 
@@ -38,7 +39,13 @@ template 版號
 
 OS release 
 
-autoinstall
+autoinstall / cloudinit
+
+
 
 
 selinux
+
+host pve 2cluster vNAS
+
+uuid disk 

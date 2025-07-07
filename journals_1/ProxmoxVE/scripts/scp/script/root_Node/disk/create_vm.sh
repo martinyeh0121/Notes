@@ -18,6 +18,21 @@ ISO_FILE="iso/ubuntu-22.04.5-live-server-amd64.iso"
 DISK_STORAGE="local-lvm"
 BRIDGE="vmbr0"
 
+qm create 499 \
+  --name "clicreate" \
+  --memory 2048 \
+  --cores 2 \
+  --cpu "x86-64-v2-AES" \
+  --machine q35 \
+  --net0 virtio,bridge=vmbr1 \
+  --scsihw virtio-scsi-pci \
+  --scsi0 local-lvm:32,iothread=on \
+  --ide2 local:iso/ubuntu-22.04.5-live-server-amd64.iso,media=cdrom \
+  --boot order=scsi0,ide2 \
+  --vga qxl \
+  --ostype l26 \
+  --agent enabled=1 
+
 # === 創建 VM ===
 echo "🛠 Creating VM $VMID ($VM_NAME)..."
 qm create $VMID \
@@ -28,9 +43,9 @@ qm create $VMID \
   --machine q35 \
   --net0 virtio,bridge=$BRIDGE \
   --scsihw virtio-scsi-pci \
-  --scsi0 $DISK_STORAGE:32 \
+  --scsi0 $DISK_STORAGE:32,iothread=on \
   --ide2 $ISO_STORAGE:$ISO_FILE,media=cdrom \
-  --boot order=scsi0;ide2 \
+  --boot order=scsi0,ide2,net0 \
   --vga qxl \
   --ostype l26 \
   --agent enabled=1 \
@@ -55,3 +70,4 @@ echo "🚀 Starting VM $VMID..."
 qm start $VMID
 
 echo "✅ VM $VMID ($VM_NAME) created and started without network config."
+

@@ -30,7 +30,7 @@ setsid lvcreate --size "${SNAP_SIZE}" --snapshot --name "${SNAP_NAME}" "${SRC_LV
 
 # 2.2 轉換成 qcow2 格式（使用 snapshot）
 echo "轉換為 qcow2..."
-qemu-img convert -f raw -O qcow2 -c "/dev/pve/${SNAP_NAME}" "${DST_DIR}/${NEW_DISK_NAME}.qcow2"
+qemu-img convert -p -f raw -O qcow2 -c "/dev/pve/${SNAP_NAME}" "${DST_DIR}/${NEW_DISK_NAME}.qcow2"
 
 # 2.3 移除 snapshot
 echo "移除 snapshot..."
@@ -45,7 +45,7 @@ read -p "請輸入 VM 磁碟槽位 (預設 scsi3): " DISK_SLOT
 DISK_SLOT=${DISK_SLOT:-scsi3}   # 沒輸入就用預設
 
 echo "設定磁碟到 VM ${DST_VMID} 的 ${DISK_SLOT}..."
-qm set "${DST_VMID}" -${DISK_SLOT} "local:${DST_VMID}/${NEW_DISK_NAME}"
+qm set "${DST_VMID}" -${DISK_SLOT} "local:${DST_VMID}/${NEW_DISK_NAME}.qcow2"
 
 echo "✅ 完成磁碟轉換與掛載！"
 
@@ -61,3 +61,22 @@ else
   echo "⚠️ 已略過 VM 掛載流程"
 fi
 
+
+
+
+
+
+# # 建立目錄
+# mkdir -p /var/lib/vz/images/200
+
+# # 建立 snapshot（避免 descriptor 洩漏使用 setsid）
+# setsid lvcreate --size 2G --snapshot --name snap_vm-100-disk-2 /dev/pve/vm-100-disk-2
+
+# # 轉換為 qcow2
+# qemu-img convert -f raw -O qcow2 -c /dev/pve/snap_vm-100-disk-2 /var/lib/vz/images/200/disk-converted.qcow2
+
+# # 刪除 snapshot
+# setsid lvremove -f /dev/pve/snap_vm-100-disk-2
+
+# # 顯示結果
+# ls -lh /var/lib/vz/images/200
