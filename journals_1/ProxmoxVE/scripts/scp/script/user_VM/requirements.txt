@@ -1,1 +1,7 @@
 cloud-init (live-srv 預設不包含)
+
+qemu-guest-agent
+
+snmpd
+    snmpd.conf
+# snmpwalk

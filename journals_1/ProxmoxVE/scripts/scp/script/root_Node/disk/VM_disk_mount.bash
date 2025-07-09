@@ -41,7 +41,7 @@ echo "👉 備份並設定 /etc/fstab 自動掛載..."
 sudo cp /etc/fstab /etc/fstab.bak
 sudo sed -i "\|$MOUNT_POINT|d" /etc/fstab
 sudo sed -i "\|UUID=$UUID|d" /etc/fstab
-echo "UUID=$UUID  $MOUNT_POINT  $FSTYPE  defaults  0  2" | sudo tee -a /etc/fstab
+echo "UUID=$UUID  $MOUNT_POINT  $FSTYPE  defaults,nofail  0  2" | sudo tee -a /etc/fstab
 
 echo "✅ 驗證掛載是否成功..."
 if mountpoint "$MOUNT_POINT"; then

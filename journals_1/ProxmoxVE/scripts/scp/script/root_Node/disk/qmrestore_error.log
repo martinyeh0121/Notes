@@ -1,0 +1,3 @@
+400 Parameter verification failed.
+vmid: type check ('integer') failed - got 'adas'
+qmrestore <archive> <vmid> [OPTIONS]

@@ -1,5 +1,19 @@
-for i in 1M 4M 16M 32M 64M 128M 256M 512M 1G 2G 4G
-do
-  echo "Testing bs=$i..."
-  dd if=/dev/zero of=/dev/null bs=$i count=1 status=none && echo "  ✅ Success" || echo "  ❌ Failed"
-done
+
+# setsid lvcreate -s -n vm-121-snap -L4G /dev/pve/vm-121-disk-0
+
+# dd if=/dev/pve/vm-121-snap of=/dev/pve/vm-102-disk-0 bs=512M status=progress conv=fsync
+
+# setsid lvremove -y /dev/pve/vm-121-snap
+
+
+# setsid lvcreate -s -n vm-120-snap -L4G /dev/pve/vm-120-disk-0
+
+# dd if=/dev/pve/vm-120-snap of=/dev/pve/vm-111-disk-0 bs=512M status=progress conv=fsync
+
+# setsid lvremove -y /dev/pve/vm-120-snap
+
+setsid lvcreate -s -n vm-603-snap -L4G /dev/pve/vm-603-disk-0
+
+dd if=/dev/pve/vm-603-snap of=/dev/ddtest-1 bs=512M status=progress conv=fsync
+
+setsid lvremove -y /dev/pve/vm-603-snap

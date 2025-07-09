@@ -16,3 +16,5 @@ ls -lh /var/lib/vz/images/121/
 
 # 4. Cli 新增硬碟到目標vm
 qm set 121 -scsi3 local:121/vm-110-disk-2.qcow2
+
+

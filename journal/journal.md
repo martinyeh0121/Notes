@@ -16,8 +16,10 @@
 | 20250703 | 調整 SSH 腳本 sshpass + read | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/scripts/scp/script/root_Node/sshbatch/VM_sshkey.sh) |
 | 20250703 | 調整 netplan / fstab 腳本 | ✅ |    |    |   | [netplan](/journals_1/ProxmoxVE/) [fstab](/journals_1/ProxmoxVE/scripts/scp/script/root_Node/disk/VM_disk_mount.bash)   |
 <!-- | 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   | -->
-| 20250707 | PVE 系統碟轉移 (dd/qcow2)  | ✅ |    |    |   | here   |
+| 20250707 | PVE 系統碟轉移 (dd/qcow2)  | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/README.md)   |
 | 20250707 | cloudinit / autoinstall | ⏳ |    |    |   | here   |
+| 20250708 | cluster ops | ⏳ |    |    |   | [here](/journals_1/ProxmoxVE/README.md)  |
+| 20250709 | qemu-guest-agent 功能整理 | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/README.md)   |
 
 <!-- | 20  | 工作內容             | 任務狀態 | 遇到的問題      | 解決方式 / 備註   |  備註2  | Link  |-->
 

@@ -174,10 +174,14 @@ ssh -i ~/.ssh/id_rsa_<hostname> root@192.168.16.62
 # /home/martin/.ssh/id_rsa_mbvm250603
 # /home/martin/.ssh/id_rsa_mbvm250604 
 # /home/martin/.ssh/id_rsa_mbpc220908
-
-
-
 ```
 
 
+
+### ssh Ops 
+
+``` sh
+# 撤銷 SSH 公鑰登入權限
+> ~/.ssh/authorized_keys
+```
 

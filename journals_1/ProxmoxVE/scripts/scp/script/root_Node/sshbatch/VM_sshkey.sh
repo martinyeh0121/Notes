@@ -1,4 +1,5 @@
 #!/bin/bash
+#  ssh-copy-id -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i ~/.ssh/id_rsa_"$KEY_NAME" user@host
 set -e
 
 # === 互動輸入 ===
