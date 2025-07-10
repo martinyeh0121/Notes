@@ -5,3 +5,7 @@ qemu-guest-agent
 snmpd
     snmpd.conf
 # snmpwalk
+
+ufw
+
+needrestart

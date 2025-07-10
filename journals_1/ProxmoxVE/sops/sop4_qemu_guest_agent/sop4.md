@@ -110,3 +110,61 @@ hostname/ip
 https://pve.proxmox.com/pve-docs/qm.1.html
 https://foxi.buduanwang.vip/virtualization/pve/530.html
 [guest exec](https://forum.proxmox.com/threads/executing-command-through-qm-guest-exec-limitations.102051/)
+
+
+# PVE API
+
+## notice
+
+1. 關於指令注入
+
+API 不能對 node 執行任意 shell 命令 (安全考量)，但能對容器或 VM 注入
+
+- 容器或 VM 裡：
+
+    QEMU VM：使用 guest-agent → /nodes/{node}/qemu/{vmid}/agent/exec
+
+    LXC 容器：使用 /nodes/{node}/lxc/{vmid}/exec API
+
+<!-- 另外 /nodes/{node}/execute
+| 功能                          | `/nodes/{node}/execute` API | 任意 Shell 指令 |
+| --------------------------- | --------------------------- | ----------- |
+| 執行多個 PVE API 操作             | ✅ Yes                       | ❌ No        |
+| 執行 arbitrary shell commands | ❌ No                        | ✅ Yes       |
+| 安全性                         | ✅ 安全（只執行已定義的 API）           | ⚠️ 潛在風險     |
+
+![alt text](image-10.png) -->
+
+## token setup
+
+
+
+## practice
+
+- 架構
+
+![alt text](image-9.png)
+
+(輸出還沒整理)
+
+
+- agent ping
+
+![alt text](image-4.png)
+
+  - 無agent
+
+  ![alt text](image-7.png)
+
+  - 有agent
+
+  ![alt text](image-8.png)
+
+
+- SSD/HDD  (by type:"nvme")
+
+![alt text](image-5.png)
+
+  - disk 資訊
+
+  ![alt text](image-6.png)

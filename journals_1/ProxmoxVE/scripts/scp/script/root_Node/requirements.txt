@@ -6,3 +6,6 @@ snmpd
 
 ncdu
 
+ufw
+
+needrestart

@@ -10,6 +10,42 @@
 
 ## cluster create
 
+
+## cluster conntction ( to master)
+
+- state table
+
+| 時間 from to | 工作內容           | 任務狀態 | 遇到的問題      | 
+|------------|--------------------------------------|----------|------------------------------------|
+|------------|--------------------------------------|----------|------------------------------------|
+
+- 從 其他機器 (mbpc220904, 192.168.16.67)透過 pvecm add 指令 加入 cluster (mbpc220908, 192.168.16.62, master)
+
+``` sh
+# 加入
+root@mbpc220904:~# pvecm add 192.168.16.62
+
+# 刪    除
+
+root@mbpc220904:~# systemctl stop pve-cluster
+root@mbpc220904:~# systemctl stop corosync
+
+root@mbpc220908:~# pvecm status
+root@mbpc220908:~# pvecm expected 2
+```
+
+- 連線正常時 master 
+![alt text](image-8.png)
+
+- 停止服務
+![alt text](image-9.png)
+
+- stop 後 master 顯示離線
+![alt text](image-7.png)
+
+![alt text](image-5.png)
+![alt text](image-4.png)
+
 ## cluster remove node
 
 - both:
