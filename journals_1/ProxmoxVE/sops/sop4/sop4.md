@@ -1,3 +1,7 @@
+[qemu-guest-agent](#qemu-guest-agent)
+
+[pve-api](#pve-api)
+
 # qemu-guest-agent
 
 ## QA
@@ -112,6 +116,8 @@ https://foxi.buduanwang.vip/virtualization/pve/530.html
 [guest exec](https://forum.proxmox.com/threads/executing-command-through-qm-guest-exec-limitations.102051/)
 
 
+
+
 # PVE API
 
 ## notice
@@ -141,7 +147,89 @@ API 不能對 node 執行任意 shell 命令 (安全考量)，但能對容器或
 
 ## practice
 
-- 架構
+- 基本使用
+
+以下是如何在 **Proxmox Virtual Environment (PVE)** 中生成與使用 API Token 的步驟：
+
+### 1. **生成 API Token**
+
+- 1. 首先，請先登入到 Proxmox 的 Web 管理界面：
+
+  1. 打開瀏覽器，並輸入你的 Proxmox 管理頁面網址（例如 `https://your-proxmox-server:8006`）。
+  2. 使用管理員帳戶登入。
+  3. 進入 **資料中心 (Datacenter)** → **權限 (Permissions)** → **API Tokens**。
+  4. 點擊右上角的 **Add** 按鈕來創建一個新的 API Token。
+
+    * **Token ID**：為該 API Token 設置一個識別名稱（例如 `mytoken`）。
+    * **User**：選擇要生成 Token 的使用者帳戶。
+    * **Role**：選擇該 Token 的權限角色（例如 `PVEAdmin` 或其他自訂角色）。
+    * **Comment**：可選填一些備註來幫助你識別這個 Token 的用途。
+    * **Expiration**：設置 Token 的有效期限（這是選擇性設定）。
+
+  生成後，你會得到 **API Token** 的 ID 和 **Secret**（密鑰）。
+
+  **請妥善保管這些資料，特別是 Secret，因為生成後就無法再次查看它。**
+
+- 2. 其次，設定 API 權限
+
+  1. 進入 **資料中心 (Datacenter)** → **權限 (Permissions)**
+  2. 新增 API Token Premission 範例如下：
+
+  ![alt text](image-11.png)
+
+
+### 2. **使用 API Token**
+
+Proxmox 使用 **JWT (JSON Web Token)** 進行認證，當你進行 API 請求時，需要將 Token 以 HTTP Header 的形式傳遞。下面是如何使用 Token 進行 API 請求的範例：
+
+#### API 結構 & 操作範例：：
+
+假設你已經有了 **API Token ID** 和 **Secret**，可以這樣使用 cURL 發送 API 請求：
+
+```bash
+curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
+-H "Authorization: PVEAPIToken=mytoken!your-token-id=your-token-secret"
+```
+
+* `https://your-proxmox-server:8006/api2/json` api entry
+* `your-proxmox-server` 是你的 Proxmox 伺服器的地址。
+* `mytoken!your-token-id` 是你生成的 Token ID（例如 `mytoken!abc123`）。
+* `your-token-secret` 是你在生成 Token 時得到的密鑰。
+
+
+
+- 使用方式可參考 [PVE API Viewer](https://pve.proxmox.com//pve-docs/api-viewer/index.html)
+
+1. **查看節點（Nodes）列表：**
+
+   ```bash
+   curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
+   -H "Authorization: PVEAPIToken=mytoken!your-token-id=your-token-secret"
+   ```
+
+2. **創建虛擬機：**
+
+   ```bash
+   curl -k -X POST "https://your-proxmox-server:8006/api2/json/nodes/your-node-name/qemu" \
+   -H "Authorization: PVEAPIToken=mytoken!your-token-id=your-token-secret" \
+   -d "vmid=100&name=testvm&memory=2048&cores=2"
+   ```
+
+3. **查看虛擬機資訊：**
+
+   ```bash
+   curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes/your-node-name/qemu/100/status/current" \
+   -H "Authorization: PVEAPIToken=mytoken!your-token-id=your-token-secret"
+   ```
+
+### - **注意事項：**
+
+  * 請確保你的 Proxmox 伺服器已經啟用了 HTTPS。
+  * 當你使用 API Token 時，要特別注意權限控制。確保每個 Token 只擁有執行特定操作的最小權限，避免過度授權。
+  * 若要調整 API Token 的權限或過期時間，可以在 Proxmox Web 界面進行修改。
+
+
+- 爬蟲架構
 
 ![alt text](image-9.png)
 

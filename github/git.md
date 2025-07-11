@@ -61,7 +61,7 @@ git remote set-url origin git@github.com:martinyeh0121/notes.git
 ## 步驟 9：推送代碼
 
 ```bash
-git push -u origin master
+git push -u origin main
 ```
 
-現在就不需要輸入用戶名和密碼了！SSH 方式更安全也更方便。
+現在就不需要輸入用戶名和密碼了！

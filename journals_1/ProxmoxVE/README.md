@@ -2,15 +2,28 @@ ProxmoxVE 操作手冊
 
 - [sops](./sops)
 
-    - [sop: VM 建置 & NAT 簡單實作](./sops/sop/sop.md)
+    - [overview](./README.md) 
+
+    - [sop](./sops/sop/sop.md)
+        - VM 建置 
+        - NAT 簡單實作
         - [架構圖01 (實做到v1)](./sops/routing.jpg)
-    - [sop2: disk 搬移 / 備份](./sops/sop2/sop2.md)
     
-    - [sop3: cluster op](./sops/sop3/sop3.md)
-    
-    - [sop4: qemu-guest-agent](./sops/sop4_qemu_guest_agent/sop4.md)
+    - [sop2](./sops/sop2/sop2.md)
+        - disk 搬移 / 備份
+
+    - [sop3](./sops/sop3/sop3.md)
+        - cluster op
+
+    - [sop4](./sops/sop4/sop4.md)
+        - qemu-guest-agent
+        - PVE API
 
 - [scripts](./scripts/scp/script/)
+
+
+- notes
+
 
 
 
