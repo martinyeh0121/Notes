@@ -1,12 +1,12 @@
-你要使用官方提供的 Ubuntu 22.04 Cloud Image（例如 `jammy-server-cloudimg-amd64.img`）來建立 VM 並自動化執行剛剛的 Cloud-init 設定，這是一個非常專業又實用的做法 👏
+要使用官方提供的 Ubuntu 22.04 Cloud Image（例如 `jammy-server-cloudimg-amd64.img`）來建立 VM 並自動化執行剛剛的 Cloud-init 設定，這是一個非常專業又實用的做法 👏
 
-以下我會一步步帶你從 **Cloud Image + Cloud-init + QEMU/PVE 模板** 的角度完成你說的安裝目標。
+以下我會一步步從 **Cloud Image + Cloud-init + QEMU/PVE 模板** 的角度完成系統安裝。
 
 ---
 
 ## ✅ 前置條件
 
-你需要準備好這些工具或環境：
+工具或環境：
 
 * Ubuntu 主機 或 Proxmox VE 環境
 * `cloud-localds`（產生 Cloud-init ISO）
@@ -70,7 +70,7 @@ runcmd:
   - echo "✅ Server 初始化完成於 $(date)" >> /var/log/cloud-init-status.log
 ```
 
-⚠️ 記得將 SSH 金鑰替換成你自己的 `~/.ssh/id_rsa.pub` 的內容。
+⚠️ 記得將 SSH 金鑰替換成自己的 `~/.ssh/id_rsa.pub` 的內容。
 
 ---
 
@@ -90,7 +90,7 @@ cloud-localds cidata.iso user-data.yaml
 
 ---
 
-## 🪜 步驟四：用 QEMU 測試（可選）
+## 🪜 步驟四：用 QEMU 測試
 
 ```bash
 qemu-system-x86_64 \
@@ -106,7 +106,7 @@ qemu-system-x86_64 \
 
 ---
 
-## 🪜 步驟五：Proxmox 上使用（超推薦）
+## 🪜 步驟五：Proxmox 上使用
 
 如果你是用 Proxmox VE，可以這樣匯入建立模板：
 

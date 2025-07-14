@@ -1,4 +1,4 @@
-好的，我來教你設定 SSH 方式，這樣更方便：
+以下設定 git SSH 方式，這樣方便隨時更新 github repo：
 
 ## 步驟 1：檢查是否已有 SSH Key
 
@@ -12,6 +12,7 @@ ls -la ~/.ssh
 
 ```bash
 ssh-keygen -t rsa -b 4096 -C "你的GitHub郵箱"
+# ssh-keygen -t rsa -b 4096 -C "你的GitHub郵箱" -f ~/.ssh/id_rsa_github  如果要自訂 ssh key 名稱
 ```
 
 按 Enter 接受預設路徑，可以設定密碼（可選）。
@@ -58,7 +59,9 @@ ssh -T git@github.com
 git remote set-url origin git@github.com:martinyeh0121/notes.git
 ```
 
-## 步驟 9：推送代碼
+## 步驟 9：推送程式碼
+
+[init project](gitinit.bash)
 
 ```bash
 git push -u origin main

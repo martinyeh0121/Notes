@@ -2,7 +2,7 @@
 
 ## 0. ~ Proxmox VE Node account 建立完畢 & 設置路由   & 前言 
 
-- 有機會再補上前面步驟！
+- 有機會再補上前面步驟！ 
 
 - 後續操作皆於 https://<Node_ip>:8006/ 的 
 UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 跟 console (VM 的 console (server 端CLI))

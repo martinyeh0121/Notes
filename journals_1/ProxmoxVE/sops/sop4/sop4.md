@@ -143,10 +143,6 @@ API 不能對 node 執行任意 shell 命令 (安全考量)，但能對容器或
 
 ## token setup
 
-
-
-## practice
-
 - 基本使用
 
 以下是如何在 **Proxmox Virtual Environment (PVE)** 中生成與使用 API Token 的步驟：
@@ -184,7 +180,7 @@ Proxmox 使用 **JWT (JSON Web Token)** 進行認證，當你進行 API 請求�
 
 #### API 結構 & 操作範例：：
 
-假設你已經有了 **API Token ID** 和 **Secret**，可以這樣使用 cURL 發送 API 請求：
+當你已經有了 **API Token ID** 和 **Secret**，可以這樣使用 cURL 發送 API 請求：
 
 ```bash
 curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
@@ -192,6 +188,8 @@ curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
 ```
 
 * `https://your-proxmox-server:8006/api2/json` api entry
+* `/nodes` uri
+
 * `your-proxmox-server` 是你的 Proxmox 伺服器的地址。
 * `mytoken!your-token-id` 是你生成的 Token ID（例如 `mytoken!abc123`）。
 * `your-token-secret` 是你在生成 Token 時得到的密鑰。
@@ -229,11 +227,20 @@ curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
   * 若要調整 API Token 的權限或過期時間，可以在 Proxmox Web 界面進行修改。
 
 
+## practice 
+
+- 位置 :
+  https://n8n.mobagel.com/workflow/PGv6ijlkCLCaVFiF/debug/71300
+  id: it.mobagel.com
+  pwd: Mobagel5355!
+
 - 爬蟲架構
 
 ![alt text](image-9.png)
 
-(輸出還沒整理)
+- 結果 (agent + ip, disk)
+
+![alt text](image-12.png) ![alt text](image-13.png)
 
 
 - agent ping
