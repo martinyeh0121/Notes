@@ -20,7 +20,18 @@ A: 不能用 qemu-guest-agent 改動
 1. Client (VM) 安裝 qemu-guest-agent
 
 ``` sh
-sudo apt-get install qemu-guest-agent
+# 安裝 qemu-guest-agent
+sudo apt-get install qemu-guest-agent -y
+
+# 啟動服務
+sudo systemctl start qemu-guest-agent
+
+# 設定開機自動啟動
+sudo systemctl enable qemu-guest-agent
+
+# 查看服務狀態（可選）
+# sudo systemctl status qemu-guest-agent
+
 ```
 
 2. 確認 Server 端 (Node) 的 ${VM} > Option > QEMU Guest Agent > Use QEMU Guest Agent 有勾選
@@ -28,11 +39,72 @@ sudo apt-get install qemu-guest-agent
 ![alt text](image-3.png)
 
 ``` sh
-qm set 110 --agent 1
-# qm set 603 --agent enabled=1,freeze-fs-on-backup=0
+# qm set 110 --agent 1
+# qm reboot 110
+################################### qm set 603 --agent enabled=1,freeze-fs-on-backup=0
+
+#!/bin/bash
+
+VMID=110
+
+# 取得 agent 設定值
+AGENT_STATUS=$(qm config $VMID | grep "^agent:" | awk '{print $2}')
+
+if [ "$AGENT_STATUS" = "1" ]; then
+    echo "VM $VMID 已啟用 QEMU Guest Agent，不執行 reboot。"
+else
+    echo "VM $VMID 未啟用 QEMU Guest Agent，執行 reboot。"
+    qm set $VMID --agent 1
+    qm reboot $VMID
+fi
 ```
 
-3. 重啟 VM
+``` js
+// Loop over input items and add a new field called 'myNewField' to the JSON of each one
+const output = [];
+
+for (const item of $input.all()) {
+  const interfaces = item.json?.data;
+
+  if (!interfaces || !Array.isArray(interfaces)) {
+    output.push({ json: {} });
+    continue;
+  }
+
+  const ips = [];
+
+  for (const iface of interfaces) {
+    const ip = iface.address;
+    // && ip?.startsWith("192.168."))
+    if (iface.families?.includes("inet") && iface.type && 
+      ['eth', 'wlan', 'wan'].includes(iface.type.toLowerCase()) &&  // 類型是 eth/wlan/wan
+      iface.address &&                                             // 有 IP (非空字串)
+      iface.address.length > 0                                     // IP 字串長度>0
+    ) {
+      ips.push({
+        name: iface.iface,
+        ip: ip
+      });
+    }
+  }
+
+  if (ips.length > 0) {
+    output.push({ json: { ips } });
+  } else {
+    for (const iface of interfaces){
+      ips.push({
+        name: iface.iface
+      });
+    }
+    output.push({ json: { ips } });
+  }
+}
+
+return output;
+
+```
+
+
 
 
 
@@ -231,8 +303,10 @@ curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
 
 - 位置 :
   https://n8n.mobagel.com/workflow/PGv6ijlkCLCaVFiF/debug/71300
-  id: it.mobagel.com
-  pwd: Mobagel5355!
+
+  - Login
+    id: it.mobagel.com
+    pwd: Mobagel5355!
 
 - 爬蟲架構
 
@@ -243,23 +317,57 @@ curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
 ![alt text](image-12.png) ![alt text](image-13.png)
 
 
-- agent ping
+- 原始 API 輸出
 
-![alt text](image-4.png)
+  - ifs
 
-  - 無agent
+    - node (較詳細)
 
-  ![alt text](image-7.png)
+      ![alt text](image-15.png)
 
-  - 有agent
+    - agent (較少)
 
-  ![alt text](image-8.png)
+      ![alt text](image-14.png)
+
+  - agent ping
+
+  ![alt text](image-4.png)
+
+    - 無agent
+
+    ![alt text](image-7.png)
+
+    - 有agent
+
+    ![alt text](image-8.png)
 
 
-- SSD/HDD  (by type:"nvme")
+  - SSD/HDD  (by type:"nvme")
 
-![alt text](image-5.png)
+  ![alt text](image-5.png)
 
-  - disk 資訊
+    - disk 資訊
 
-  ![alt text](image-6.png)
+    ![alt text](image-6.png)
+
+
+## 遇到問題
+
+1. 網路不通
+
+解決絲路: 
+- n8n env: webhook-tunnel 導致 http 路由改變 (x 無影響)
+- n8n tcp攔截: 封包確認路由 (tcpdump) + nslookup (tcpdump 花時間, 非問題) 
+- 192.168.16.xx : 5678 (n8n) to 192.168.5.xx : 8006 (pve)，應該是防火牆講錯 port
+  (只通 192.168.5.xx : 8006 的 8006 講成 192.168.16.xx : 5678 的 5678，導致開通 192.168.5.xx : 5678，而 8006 連不上)
+
+2. 1_pve primission 不足
+
+解決絲路: 
+- pve 8.3+ require master node 才能query (好像沒這回事?)
+- api 綁 user 受 user 權限 block (部分對)
+- user assign group -> group assign primission 
+
+2. 2_primission 跳掉
+
+原因: ldap 自動更新，覆蓋 pve primission 設定

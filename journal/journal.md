@@ -21,6 +21,9 @@
 | 20250709 | qemu-guest-agent 功能整理 | ✅ |    |    |   | [here](/journals_1/ProxmoxVE/README.md)   |
 | 20250710 | PVE API agent ping / disk lookup  | ✅ |    |  參閱 /sop4  |   | [here](/journals_1/ProxmoxVE/README.md)   |
 | 20250710 | snmp setup script v1 | ✅ |    | 參閱 /scripts   |   | [here](/journals_1/ProxmoxVE/README.md)   |
+| 20250714 | Appscript 研究 | ✅ |    |  ope_request  |   | [none]()   |
+| 20250715 |  | ✅ |    |    |   | [none]()   |
+| 20250716 | PVE API 抓 ip | ✅ |    | 參閱 /sop4   |   | [here](/journals_1/ProxmoxVE/README.md)   |
 
 
 <!-- | 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   | -->
@@ -31,5 +34,5 @@
 ✅: 完成 , ⏳: 未完成 , 🔄: 持續調整 daily routine
 ☑️: 手冊待調整
 
-
-[Catalog](/README.md)
+- [penal](journals_1/ProxmoxVE/README.md) **<--**
+- [Catalog](/README.md)

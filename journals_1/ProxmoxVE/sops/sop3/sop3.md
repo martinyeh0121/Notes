@@ -241,8 +241,7 @@ pvecm expected 1
 
 ``` sh
 # 1st
-systemctl stop pve-cluster
-systemctl stop corosync
+systemctl stop pve-cluster corosync
 pmxcfs -l
 rm -rf /etc/pve/corosync.conf
 rm -rf /var/lib/corosync/*
@@ -257,27 +256,141 @@ reboot
 
 ## node 移出 cluster
 
+### fs 整理
+
+/etc/pve
+
+| 檔案/資料夾            | 用途說明                  | 屬於誰？                    |
+| ----------------- | --------------------- | ----------------------- |
+| `qemu-server/`    | 所有 VM 的設定檔 (`*.conf`) | 節點本地（但存在於 cluster db 中） |
+| `lxc/`            | LXC Container 設定檔     | 節點本地                    |
+| `nodes/`          | 各節點個別設定資料夾（如 GUI 設定）  | 節點本地                    |
+| `local/`          | 舊版設定目錄（不再推薦使用）        | 節點本地                    |
+| `storage.cfg`     | 儲存空間定義                | Cluster 共用, 單機必須     |
+| `datacenter.cfg`  | 資料中心（全域）設定            | Cluster 共用, 單機必須       |
+| `user.cfg`        | Proxmox 使用者與權限        | Cluster 共用, 單機必須    |
+| `vzdump.cron`     | 備份排程                  | Cluster 共用, 單機必須     |
+| `sdn/`            | 軟體定義網路設定              | Cluster 共用              |
+| `corosync.conf`   | Cluster 網路通訊設定        | Cluster 共用              |
+| `firewall/`       | Cluster 層級防火牆規則       | Cluster 共用              |
+| `authkey.pub`     | Cluster 授權金鑰          | Cluster 共用              |
+| `pve-root-ca.pem` | 叢集的 CA 憑證             | Cluster 共用              |
+
+| 類型               | 說明                                                                           |
+| ---------------- | ---------------------------------------------------------------------------- |
+| **Cluster only** | `corosync.conf`、`/etc/corosync/`、`/var/lib/corosync/` 👉 可以刪除，重建 cluster 才需要 |
+| **共用 + 單機必須**    | `storage.cfg`、`datacenter.cfg`、`user.cfg`、`vzdump.cron` 👉 **單機仍需保留或重建**     |
+| **節點本地 VM 設定**   | `qemu-server/`、`lxc/` 👉 和 VM 直接相關，最重要資料                                     |
+
+
+
+
+### 實作
+
+- 流程: 備份 -> 移除 -> 復原
 
 ``` sh
-# 1st
-systemctl stop pve-cluster
-systemctl stop corosync
+# 統一的備份時間戳
+BACKUP_TIME=$(date +%F_%H%M%S)
+BACKUP_DIR="/root/pve_backup_$BACKUP_TIME"
 
+# 建立備份目錄
+mkdir -p "$BACKUP_DIR"
+
+# 備份 VM 配置檔（虛擬機器設定）
+cp -a /etc/pve/qemu-server "$BACKUP_DIR/"
+
+# 備份 cluster 設定和 corosync 配置
+cp -a /etc/pve/corosync.conf "$BACKUP_DIR/" 2>/dev/null || echo "corosync.conf 不存在，跳過"
+cp -a /etc/corosync "$BACKUP_DIR/" 2>/dev/null || echo "/etc/corosync 不存在，跳過"
+cp -a /var/lib/corosync "$BACKUP_DIR/" 2>/dev/null || echo "/var/lib/corosync 不存在，跳過"
+
+# 備份 cluster 資料庫（pve-cluster）
+cp -a /var/lib/pve-cluster "$BACKUP_DIR/"
+
+echo "✅ 備份完成，所有資料已儲存到 $BACKUP_DIR"
+
+
+
+# --------------------------
+
+# Step 1: 停止服務
+systemctl stop pve-cluster corosync pmxcfs
+
+# Step 2: 確認沒有殘留 pmxcfs 進程
 # killall -9 pmxcfs
-pmxcfs -l  # local mode，/etc/pve 改為可寫入的本機版本
 
-# rm /var/lib/pve-cluster/config.db*
-rm -rf /etc/pve/corosync.conf
+# Step 3: 啟動 pmxcfs 在本地模式（不使用 cluster）
+pmxcfs -l
+
+# Step 4: 刪除 cluster 和 corosync 設定（請小心！）
+# rm -f /var/lib/pve-cluster/config.db*
+rm -rf /var/lib/pve-cluster/*
+rm -f /etc/pve/corosync.conf
 rm -rf /var/lib/corosync/*
 rm -rf /etc/corosync/*
-rm -rf /var/lib/pve-cluster/* 
 
+# Step 5: 確保沒有 pmxcfs 進程
 killall -9 pmxcfs
+
+# Step 6: 重新啟動系統
 reboot
 
+
+
+
+# --------------------------
+
+
+# 請替換為你實際的備份資料夾名稱
+BACKUP_DIR="/root/pve_backup_2025-07-15_104500"
+
+# 停止相關服務
+systemctl stop pve-cluster corosync pmxcfs
+# killall -9 pmxcfs
+
+# 卸載 /etc/pve 如果是壞掉的 FUSE 掛載
+umount -l /etc/pve 2>/dev/null
+
+# 啟動 pmxcfs 本地模式讓 /etc/pve 可寫
+pmxcfs -l &
+sleep 3  # 等待 pmxcfs 啟動
+
+# 恢復 VM 設定檔
+cp -a "$BACKUP_DIR/qemu-server" /etc/pve/
+
+# 恢復 corosync 設定（若你還是要用 cluster，可選擇性還原）
+if [ -f "$BACKUP_DIR/corosync.conf" ]; then
+  cp -a "$BACKUP_DIR/corosync.conf" /etc/pve/
+fi
+if [ -d "$BACKUP_DIR/corosync" ]; then
+  cp -a "$BACKUP_DIR/corosync" /etc/
+fi
+if [ -d "$BACKUP_DIR/corosync" ]; then
+  cp -a "$BACKUP_DIR/corosync" /var/lib/
+fi
+
+# 恢復 cluster 資料庫（慎用！只適用你確定還原整個 cluster 狀態）
+cp -a "$BACKUP_DIR/pve-cluster" /var/lib/
+
+# 結束本地 pmxcfs
+killall -9 pmxcfs
+sleep 2
+
+# 重新啟動服務
+systemctl start pmxcfs
+systemctl start pve-cluster
+systemctl start corosync  # 如果你還使用 cluster
+
+# 驗證是否恢復成功
+ls /etc/pve/qemu-server
+
 ```
+
+
 - 檔案服務檢查正常，但 UI 仍顯示另一個 node，並且連線錯誤
 ![alt text](image.png)
+
 
 ``` sh
 # 2nd
