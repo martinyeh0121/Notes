@@ -1,0 +1,15 @@
+boot: order=scsi0;net0
+cores: 2
+cpu: x86-64-v2-AES
+# ide2: local:iso/ubuntu-22.04.5-live-server-amd64.iso,media=cdrom,size=2086842K
+machine: q35
+memory: 2048
+name: mbvm250604
+net0: virtio=BC:24:11:37:B6:4C,bridge=vmbr0,firewall=1
+ostype: l26
+scsi0: local-lvm:vm-101-disk-0,iothread=1,size=32G
+scsihw: virtio-scsi-single
+sockets: 1
+vga: qxl
+
+

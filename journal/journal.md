@@ -24,6 +24,10 @@
 | 20250714 | Appscript 研究 | ✅ |    |  ope_request  |   | [none]()   |
 | 20250715 |  | ✅ |    |    |   | [none]()   |
 | 20250716 | PVE API 抓 ip | ✅ |    | 參閱 /sop4   |   | [here](/journals_1/ProxmoxVE/README.md)   |
+| 20250717 | Cacti batch create script | ✅ |    |  參閱 /sopxx  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250717 | Cacti tree usage | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250718 | snmp script (mib) debug | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250718 | 主機灌ubuntu / 裝GPU(待監控) | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 
 
 <!-- | 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   | -->

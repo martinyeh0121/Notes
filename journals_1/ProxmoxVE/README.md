@@ -4,10 +4,12 @@ ProxmoxVE 操作手冊
 
     - [overview](./README.md) 
 
-    - [sop](./sops/sop/sop.md)
+    - [sop1](./sops/sop1/sop.md)
         - VM 建置 
         - NAT 簡單實作
         - [架構圖01 (實做到v1)](./sops/routing.jpg)
+
+    - [sop1_2](./sops/sop1/sop.md)
     
     - [sop2](./sops/sop2/sop2.md)
         - disk 搬移 / 備份

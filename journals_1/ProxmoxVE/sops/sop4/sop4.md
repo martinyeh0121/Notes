@@ -2,6 +2,8 @@
 
 [pve-api](#pve-api)
 
+[遇到問題紀錄](#遇到問題)
+
 # qemu-guest-agent
 
 ## QA
@@ -371,3 +373,102 @@ curl -k -X GET "https://your-proxmox-server:8006/api2/json/nodes" \
 2. 2_primission 跳掉
 
 原因: ldap 自動更新，覆蓋 pve primission 設定
+
+
+3. rpm = -1
+
+原因: PERC_H730_Mini 是 RAID (磁碟陣列)，不能直接看 rpm
+
+``` json
+"data": [
+  {
+    "wearout": "N/A",
+    "type": "unknown",
+    "osdid-list": null,
+    "used": "BIOS boot",
+    "serial": "61866da063c7c0002acd4ba91d15f4c3",
+    "osdid":-1,
+    "wwn": "0x61866da063c7c000",
+    "by_id_link":"/dev/disk/by-id/scsi-361866da063c7c0002acd4ba91d15f4c3",
+    "rpm": -1,
+    "size":239444426752,
+    "health":"UNKNOWN",
+    "vendor": "DELL    ",
+    "gpt": 1,
+    "model": "PERC_H730_Mini",
+    "devpath": "/dev/sda"
+  }
+]
+```
+
+4. agent true，但沒有ip (MBPC230313)
+
+原因: 確認後真的沒抓到 ipv4，VM 建立時本就可能沒配發到
+
+``` json
+{
+  "node": "MBPC230313",
+  "vmid": 255,
+  "agent": "true",
+  "timestamp": "2025-07-16T14:21:25.408+08:00",
+  "success": "true",
+  "data": {
+    "data": {
+      "result": [
+        {
+          "statistics": {
+            "rx-bytes": 5238599288,
+            "rx-packets": 73748820,
+            "tx-dropped": 0,
+            "rx-errs": 0,
+            "tx-bytes": 5238599288,
+            "tx-packets": 73748820,
+            "rx-dropped": 0,
+            "tx-errs": 0
+          },
+          "name": "lo",
+          "hardware-address": "00:00:00:00:00:00",
+          "ip-addresses": [
+            {
+              "prefix": 8,
+              "ip-address-type": "ipv4",
+              "ip-address": "127.0.0.1"
+            },
+            {
+              "prefix": 128,
+              "ip-address": "::1",
+              "ip-address-type": "ipv6"
+            }
+          ]
+        },
+        {
+          "ip-addresses": [
+            {
+              "ip-address": "fe80::be24:11ff:fe43:5c18",
+              "ip-address-type": "ipv6",
+              "prefix": 64
+            }
+          ],
+          "hardware-address": "bc:24:11:43:5c:18",
+          "name": "eth0",
+          "statistics": {
+            "rx-packets": 457919,
+            "rx-bytes": 115395588,
+            "rx-errs": 0,
+            "tx-dropped": 0,
+            "tx-packets": 218485,
+            "tx-bytes": 72390680,
+            "tx-errs": 0,
+            "rx-dropped": 0
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+5. agent = check n8n
+
+- condition1: 595 error 當 node 離線
+  處理: 新增 N/A 欄位
