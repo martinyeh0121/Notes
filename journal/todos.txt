@@ -39,8 +39,6 @@ template 版號
 
 OS release 
 
-autoinstall / cloudinit
-
 
 
 
@@ -49,3 +47,27 @@ selinux
 host pve 2cluster vNAS
 
 uuid disk 
+
+
+
+
+庫存管理系統 
+
+
+
+pve ceph / NFS  storage server 
+
+autoinstall / cloudinit (sop 1_2)  -> autoinstall setup + 
+
+PXE iso server (網路開機)
+
+cacti 正式環境監控
+
+GPU monitoring (RTX 3080  PCL 直通 + DECM exporter)
+
+usb 系統安裝流程 / BIOS upgrade (sop0)
+
+
+
+
+blade

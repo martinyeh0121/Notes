@@ -27,7 +27,11 @@
 | 20250717 | Cacti batch create script | ✅ |    |  參閱 /sopxx  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250717 | Cacti tree usage | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250718 | snmp script (mib) debug | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250718 | 主機灌ubuntu / 裝GPU(待監控) | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250718 | 主機重灌ubuntu / 裝GPU(待監控) | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250721/22 | 主機重灌 ubuntu *6 + 主機配置清點 *8 / 流程優化規劃 | ✅ |   |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250722 | autoinstall (自動化安裝) 研究 | ✅ | iso 讀取 | 使用 rufus  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250723 | 主機實作 autoinstall 無網路版本 *2 | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250724 | cacti 監控開發環境 (16.xx) | ✅ |    | 系統自動掃描  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 
 
 <!-- | 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   | -->

@@ -179,3 +179,36 @@ qm template 9000
 * 檔案結構說明
 
 會讓你操作更流暢。需要嗎？
+
+
+
+## user-data
+
+  network:
+    version: 2
+    ethernets: []
+    
+不行
+
+  network:
+    version: 2
+    ethernets:
+      id0:
+        match:
+          name: "en*"
+        dhcp4: true
+
+可以
+
+  network:
+    version: 2
+    ethernets:
+      id0:
+        match:
+          name: "en*"
+        dhcp4: 
+
+ok
+
+sudo hostnamectl set-hostname new-hostname
+

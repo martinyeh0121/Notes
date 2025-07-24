@@ -13,6 +13,11 @@ script:
 
 [scripts](/journals_1/ProxmoxVE/scripts/disk/home/)
 
+## 0.0 目標
+
+/var/lib/vz/images (local)
+
+
 ## 0. 儲存格式概覽 (GPT, [可略](#v1-直接-copy-qemu-img-根據虛擬硬碟實際用的space-dd-逐bit-copy)) 
 
 ### 🧾 效能與空間使用比較表（PVE）

@@ -8,10 +8,38 @@
 
 # cluster 操作
 
-## cluster create
+## cluster create  (master node)
+
+pvecm create "cluster_name"
+
+## cluster add  (外部 node 加入)
+
+pvecm add "master_node_ip"
+
+## cluster 
+
+## deleted node in cluster 
+
+``` sh
+
+# 確認節點已下線
+pvecm status
+
+# !!!: 事前務必確認 node 已下線(建議) + VM 已轉移 / vzdump + quorum 符合條件
+pvecm delnode ${nodename}
+
+# (可選) 刪除殘留 node 資料
+rm /etc/pve/nodes/${nodename}
+
+```
+
+## deleted node recovery
+
+<!-- /var/lib/pve-cluster/config.db 在加入 cluster 時會自動備份到 /var/lib/pve-cluster/backup/config-1753336469.sql.gz  -->
 
 
-## quorum
+
+## 補充: quorum 機制
 
 - ref:
 
@@ -201,8 +229,7 @@ root@mbpc220904:~# pvecm add 192.168.16.62
 
 # 刪    除
 
-root@mbpc220904:~# systemctl stop pve-cluster
-root@mbpc220904:~# systemctl stop corosync
+root@mbpc220904:~# systemctl stop pve-cluster corosync
 
 root@mbpc220908:~# pvecm status
 root@mbpc220908:~# pvecm expected 2
@@ -246,13 +273,35 @@ pmxcfs -l
 rm -rf /etc/pve/corosync.conf
 rm -rf /var/lib/corosync/*
 rm -rf /etc/corosync/*
-rm -rf /var/lib/pve-cluster/* 
-# rm -rf /etc/pve/nodes/<mbpc220905>
+# rm -rf /var/lib/pve-cluster/* 
+#
+# rm -rf    /<mbpc220905>
 
 killall -9 pmxcfs
 reboot
-
 ```
+
+``` sh
+root@mbpc220904:~# pvecm add 192.168.16.62
+Please enter superuser (root) password for '192.168.16.62': password input aborted
+root@mbpc220904:~# pvecm add 192.168.16.65
+Please enter superuser (root) password for '192.168.16.65': 
+Establishing API connection with host '192.168.16.65'
+The authenticity of host '192.168.16.65' can't be established.
+X509 SHA256 key fingerprint is 3B:10:23:3E:41:87:35:23:16:F8:D8:B0:93:30:11:02:7D:47:26:FA:1B:DB:15:3A:DC:C4:31:E4:E4:9E:62:0A.
+Are you sure you want to continue connecting (yes/no)? yes
+Login succeeded.
+check cluster join API version
+No cluster network links passed explicitly, fallback to local node IP '192.168.16.67'
+Request addition of this node
+Join request OK, finishing setup locally
+stopping pve-cluster service
+backup old database to '/var/lib/pve-cluster/backup/config-1753336469.sql.gz'
+Job for corosync.service failed because the control process exited with error code.
+starting pve-cluster failed: See "systemctl status corosync.service" and "journalctl -xeu corosync.service" for details.
+root@mbpc220904:~# 
+```
+
 
 ## node 移出 cluster
 
@@ -315,9 +364,10 @@ echo "✅ 備份完成，所有資料已儲存到 $BACKUP_DIR"
 # --------------------------
 
 # Step 1: 停止服務
-systemctl stop pve-cluster corosync pmxcfs
+systemctl stop pve-cluster corosync 
+# ?pmxcfs
 
-# Step 2: 確認沒有殘留 pmxcfs 進程
+# Step 2?: 確認沒有殘留 pmxcfs 進程
 # killall -9 pmxcfs
 
 # Step 3: 啟動 pmxcfs 在本地模式（不使用 cluster）

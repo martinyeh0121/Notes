@@ -7,15 +7,17 @@ ProxmoxVE 操作手冊
     - [sop1](./sops/sop1/sop.md)
         - VM 建置 
         - NAT 簡單實作
-        - [架構圖01 (實做到v1)](./sops/routing.jpg)
+        - [架構圖01](./sops/routing.jpg)
 
-    - [sop1_2](./sops/sop1/sop.md)
+    - [sop1_1](./sops/sop1_1/sop1_1.md): cloudinit
+    - [sop1_2](./sops/sop1_2/sop1_2.md): autoinstall
+    - [sop1_3](./sops/sop1_3/sop1_3.md): pxe 網路開機
     
     - [sop2](./sops/sop2/sop2.md)
         - disk 搬移 / 備份
 
     - [sop3](./sops/sop3/sop3.md)
-        - cluster op
+        - cluster op  
 
     - [sop4](./sops/sop4/sop4.md)
         - qemu-guest-agent
