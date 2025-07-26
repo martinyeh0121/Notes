@@ -39,6 +39,30 @@ rm /etc/pve/nodes/${nodename}
 
 
 
+
+
+
+
+
+
+## batch hostname rename
+
+**steps**: 
+ 1. 一起改名 (hostnamectl) 
+ 2. 改 /etc/pve/corosync.conf (共用) 
+ 3. 改 /etc/pve/node/nodename (共用) 
+ 4. 逐個 systemctl restart corosync pveproxy pvecluster
+
+``` sh
+hostnamectl set-hostname 新hostname
+```
+
+
+
+
+
+
+
 ## 補充: quorum 機制
 
 - ref:

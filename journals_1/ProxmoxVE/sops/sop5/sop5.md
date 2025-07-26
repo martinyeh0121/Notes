@@ -78,3 +78,9 @@ SNMPv2-MIB::sysObjectID.0 = OID: NET-SNMP-TC::linux
 ### Graph Rule
 
 **功能**: automation field discovery
+
+
+## Data Profile (蒐集間隔)
+
+![alt text](image-1.png)
+![alt text](image-2.png)
