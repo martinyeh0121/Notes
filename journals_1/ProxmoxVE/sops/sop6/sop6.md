@@ -199,8 +199,6 @@ DB_Password yourpassword
 DB_Port     3306
 DB_PreG     none
 
-# 啟用多執行緒
-Threads = 10
 ```
 
 ---
@@ -460,13 +458,16 @@ Unit=cacti-poller.service
 WantedBy=timers.target
 ```
 
-#### 啟用並啟動 timer
+#### systemd 啟用 
 ```bash
-sudo systemctl daemon-reload
+# 啟用並啟動 timer 
 sudo systemctl enable --now cacti-poller.timer
-```
 
----
+
+# Poller/Timer 服務重啟 (更新設定)
+sudo systemctl daemon-reload
+sudo systemctl restart cacti-poller.timer
+```
 
 ### 3. 資料庫操作（DB 操作）
 
@@ -491,16 +492,11 @@ SELECT name, value FROM settings WHERE name IN ('poller_interval', 'cron_interva
 UPDATE settings SET value = '30' WHERE name = 'cron_interval';
 ```
 
----
 
-### 4. Poller/Timer 服務重啟
-```bash
-sudo systemctl restart cacti-poller.service cacti-poller.timer
-```
 
 ---
 
-### 5. 注意事項
+### 4. 注意事項
 - **poller_interval** 與 **cron_interval** 都需設為 30（秒），否則會有輪詢不同步問題。
 - systemd timer 啟用後，cron 就不再需要，避免重複執行。
 - 若有自訂 poller script 路徑，請同步調整 `ExecStart`。

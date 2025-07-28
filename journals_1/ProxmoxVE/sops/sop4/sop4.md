@@ -190,6 +190,13 @@ https://foxi.buduanwang.vip/virtualization/pve/530.html
 [guest exec](https://forum.proxmox.com/threads/executing-command-through-qm-guest-exec-limitations.102051/)
 
 
+## live migration agent
+- ssh 未中斷
+- append 程式
+![alt text](image-16.png)
+- 2025-07-28 16:11:41 migration finished successfully (duration 00:04:08)
+- 2025-07-28 16:03:15.182 - 2025-07-28 16:12:03.398
+
 
 
 # PVE API
