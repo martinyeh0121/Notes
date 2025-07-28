@@ -1,5 +1,6 @@
+# hostname 更改流程
 
-## hostname 更改流程 
+## PVE instance
 
 ### notice
 
@@ -40,8 +41,8 @@ killall -9 pmxcfs
 ### 舊 hostname 改成新 hostname
 
 ``` sh
-hostnamectl set-hostname mbpc220905
-nano /etc/hosts
+hostnamectl set-hostname $newhostname
+nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1.1 or static ip
 ```
 
 ### 完成以上動作後重啟
@@ -62,4 +63,35 @@ pvecm add $IP_of_the_healthy_Node_of_the_Cluster
 ### 完成hostname 更改
 
 
-##
+
+
+## Ubuntu instance
+
+### 舊 hostname 改成新 hostname
+
+``` sh
+hostnamectl set-hostname $newhostname
+nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1.1 or static ip
+```
+
+### 重啟服務以讀取新 hostname (可選)
+
+**需要注意哪些服務**:  郵件、Web、監控、DNS、NFS ... 
+
+| 類型                                         | 是否建議重啟                    | 原因                            |
+| ---------------------------------------------- | ------------------------- | --------------------------------------------- |
+| **SSH (sshd)**                            | ❌ 不需要                     | hostname 不影響 SSH 運作。                          |                  |
+| **網路服務（如 Apache、Nginx）**                    | ❌ 不一定                     | 通常 hostname 不影響 web server，除非你依賴它作為 vhost 名稱。 |
+| **Postfix / Sendmail**                         | ✅ 改設定檔 + 重啟               | 郵件主機名通常跟 hostname 綁定。
+| **journald (日誌)**                              | ✅ 建議重啟                    | 日誌會記錄 hostname，有些情況要重啟才會反映新名稱。                |    
+| **Syslog / rsyslog / syslog-ng**               | ✅ 建議重啟                    | Log 主機名稱會用 hostname。                          |
+| **snmpd**                                 | ✅ 建議重啟                    | 主機名稱的mib會用   |
+| **Monitoring agents（如 Zabbix agent, Datadog）** | ✅ 建議重啟                    | 監控 agent 常會回報 hostname，需重啟讓它刷新。               |
+| **Docker / containerd**                  | ❌ 不需要，但容器內可能看不到新 hostname | 容器會保留原始啟動時的主機資訊。   |
+
+``` sh
+# mail 服務通常也要改 config
+sudo systemctl restart systemd-journald snmpd syslog postfix
+```
+
+
