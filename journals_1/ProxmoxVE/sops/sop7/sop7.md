@@ -8,18 +8,27 @@
 
 > 確認移除 node 後 quorum 數量符合
 
+![alt text](image-2.png)
+
+此次操作為 mbpc220905 更名為 mbpcd192-168-16-65  
+
+
 
 
 ### 從 cluster 上移除 node (若 node 連接 cluster)
 
-1. 在 cluster 上其他 node 
+1. 在 cluster 上其他任意 node 做刪除操作
 
 ``` sh
 pvecm delnode $nodename
 ```
 
+![alt text](image-1.png)
 
-2. 在被移除 node
+
+
+
+2. 在被移除 node 重設 cluster 相關設定
 
 ``` sh
 # Step 1: 停止服務
@@ -38,29 +47,74 @@ rm -rf /etc/corosync/*
 # Step 4: 終止 pmxcfs 進程 & 重開機
 killall -9 pmxcfs
 ```
+
+![alt text](image-3.png)
+
+
+
 ### 舊 hostname 改成新 hostname
 
 ``` sh
-hostnamectl set-hostname $newhostname
+# 1. 設定新主機名稱（hostname）：
+hostnamectl set-hostname $newhostname # sudo 
+
+# 2. 更新 /etc/hosts 檔案：
 nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1.1 or static ip
 ```
+![alt text](image-4.png)
+![alt text](image-5.png)
 
-### 完成以上動作後重啟
+
+- 此為 system-level 的設定變更，影響主機在網路與本地服務中的識別，部分服務需重啟才能正確套用，建議重開機（reboot）以套用所有相關服務設定。
+
+- 特定服務在修改 hostname 後可能需要重新啟動才會更新，常見如：
+    - SSH：需重新連線
+    - Snmpd：需手動重啟，否則無法即時反映新 hostname
+
+
+### 完成以上動作後重啟 Node
+
+目的:
+- 將新 hostname 套用到主機所有服務
+- 重置 cluster 相關設定，完成移除操作
 
 ``` sh
 reboot
 ```
 
-### 最後加入新 host
+### 重啟後連線，再次加入 cluster 
 
 ``` sh
 pvecm add $IP_of_the_healthy_Node_of_the_Cluster
 ```
 
+``` sh
+root@mbpcd192-168-16-65:~# pvecm add 192.168.16.67
+Please enter superuser (root) password for '192.168.16.67': ***********
+Establishing API connection with host '192.168.16.67'
+The authenticity of host '192.168.16.67' can't be established.
+X509 SHA256 key fingerprint is 03:D3:BC:D3:2C:DD:E0:DA:FF:88:31:2D:69:08:5C:31:63:6C:6A:6A:EA:0C:97:89:B3:95:4F:DF:41:B9:93:28.
+Are you sure you want to continue connecting (yes/no)? yes
+Login succeeded.
+check cluster join API version
+No cluster network links passed explicitly, fallback to local node IP '192.168.16.65'
+Request addition of this node
+Join request OK, finishing setup locally
+stopping pve-cluster service
+backup old database to '/var/lib/pve-cluster/backup/config-1753763030.sql.gz'
+waiting for quorum...OK
+(re)generate node files
+generate new node certificate
+merge authorized SSH keys
+generated new node certificate, restart pveproxy and pvedaemon services
+successfully added node 'mbpcd192-168-16-65' to cluster.
+root@mbpcd192-168-16-65:~# 
+```
+
 ![alt text](image.png)
 
 
-### 完成hostname 更改
+### 完成更改 hostname 流程
 
 
 
@@ -90,7 +144,7 @@ nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1
 | **Docker / containerd**                  | ❌ 不需要，但容器內可能看不到新 hostname | 容器會保留原始啟動時的主機資訊。   |
 
 ``` sh
-# mail 服務通常也要改 config
+# mail 服務通常也要改 config, ex. /etc/postfix/main.cf
 sudo systemctl restart systemd-journald snmpd syslog postfix
 ```
 

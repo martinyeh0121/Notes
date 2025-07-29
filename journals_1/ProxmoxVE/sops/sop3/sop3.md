@@ -387,24 +387,24 @@ echo "✅ 備份完成，所有資料已儲存到 $BACKUP_DIR"
 
 # --------------------------
 
-# Step 1: 停止服務
-systemctl stop pve-cluster corosync 
-# ?pmxcfs
+   # Step 1: 停止服務
+   systemctl stop pve-cluster corosync 
+   # ?pmxcfs
 
 
-# Step 2: 啟動 pmxcfs 在本地模式（不使用 cluster）
-pmxcfs -l
+   # Step 2: 啟動 pmxcfs 在本地模式（不使用 cluster）
+   pmxcfs -l
 
-# Step 3: 刪除 cluster 和 corosync 設定（請小心！）
-# rm -f /var/lib/pve-cluster/config.db*
-rm -rf /var/lib/pve-cluster/*
-rm -f /etc/pve/corosync.conf
-rm -rf /var/lib/corosync/*
-rm -rf /etc/corosync/*
+   # Step 3: 刪除 cluster 和 corosync 設定（請小心！）
+   # rm -f /var/lib/pve-cluster/config.db*
+   rm -rf /var/lib/pve-cluster/*
+   rm -f /etc/pve/corosync.conf
+   rm -rf /var/lib/corosync/*
+   rm -rf /etc/corosync/*
 
-# Step 4: 終止 pmxcfs 進程 & 重開機
-killall -9 pmxcfs
-reboot
+   # Step 4: 終止 pmxcfs 進程 & 重開機
+   killall -9 pmxcfs
+   reboot
 
 
 
