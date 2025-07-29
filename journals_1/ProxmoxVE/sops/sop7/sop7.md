@@ -70,7 +70,7 @@ nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1
 - 特定服務在修改 hostname 後可能需要重新啟動才會更新，常見如：
     - SSH：需重新連線
     - Snmpd：需手動重啟，否則無法即時反映新 hostname
-
+    - pve web ui 可以單獨重啟 pveproxy 查看，但其他服務的運作仍用舊名
 
 ### 完成以上動作後重啟 Node
 
@@ -114,7 +114,9 @@ root@mbpcd192-168-16-65:~#
 ![alt text](image.png)
 
 
-### 完成更改 hostname 流程
+### 完成更改 hostname 流程 可登入查看
+
+![alt text](image-6.png)
 
 
 
