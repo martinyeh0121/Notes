@@ -12,6 +12,9 @@
 
 此次操作為 mbpc220905 更名為 mbpcd192-168-16-65  
 
+### 前置: 轉移 VM 資料 
+
+![alt text](image-7.png)
 
 
 
@@ -72,7 +75,7 @@ nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1
     - Snmpd：需手動重啟，否則無法即時反映新 hostname
     - pve web ui 可以單獨重啟 pveproxy 查看，但其他服務的運作仍用舊名
 
-### 完成以上動作後重啟 Node
+### 完成以上動作後重啟 node 主機
 
 目的:
 - 將新 hostname 套用到主機所有服務
@@ -82,7 +85,7 @@ nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1
 reboot
 ```
 
-### 重啟後連線，再次加入 cluster 
+### 重啟後連線 (local / ssh / UI)，再次加入 cluster 
 
 ``` sh
 pvecm add $IP_of_the_healthy_Node_of_the_Cluster
@@ -93,7 +96,7 @@ root@mbpcd192-168-16-65:~# pvecm add 192.168.16.67
 Please enter superuser (root) password for '192.168.16.67': ***********
 Establishing API connection with host '192.168.16.67'
 The authenticity of host '192.168.16.67' can't be established.
-X509 SHA256 key fingerprint is 03:D3:BC:D3:2C:DD:E0:DA:FF:88:31:2D:69:08:5C:31:63:6C:6A:6A:EA:0C:97:89:B3:95:4F:DF:41:B9:93:28.
+X509 SHA256 key fingerprint is 00:00:00:D3:00:DD:00:00:00:88:00:2D:69:00:5C:31:00:6C:00:6A:EA:0C:00:00:B3:00:4F:DF:00:00:93:28.
 Are you sure you want to continue connecting (yes/no)? yes
 Login succeeded.
 check cluster join API version
@@ -111,10 +114,10 @@ successfully added node 'mbpcd192-168-16-65' to cluster.
 root@mbpcd192-168-16-65:~# 
 ```
 
-![alt text](image.png)
+<!-- ![alt text](image.png) -->
 
 
-### 完成更改 hostname 流程 可登入查看
+### 完成更改 hostname 流程，可登入 UI 查看
 
 ![alt text](image-6.png)
 
@@ -150,4 +153,5 @@ nano /etc/hosts # $檔案內 舊hostname 改成 new hostname，通常是 127.0.1
 sudo systemctl restart systemd-journald snmpd syslog postfix
 ```
 
-
+# ref
+https://pve.proxmox.com/wiki/Renaming_a_PVE_node

@@ -38,3 +38,53 @@ menuentry "Try or Install Ubuntu Server" {
 	initrd	/casper/initrd
 }
 ```
+
+``` sh
+mkdir /mnt/iso
+mkdir: cannot create directory ‘/mnt/iso’: Permission denied
+
+sudo mkdir /mnt/iso
+[sudo] password for martin:
+
+ls /mnt
+c  wsl  wslg
+
+# 本機 /mnt/c/Users/marti/Downloads/ubuntu-22.04.5-live-server-amd64.iso
+cd /mnt/c/Users/marti/Downloads/
+
+sudo mount -o loop ubuntu-22.04.5-live-server-amd64.iso /mnt/iso
+mount: /mnt/iso: WARNING: source write-protected, mounted read-only.
+
+mkdir ~/custom-ubuntu-iso
+
+cd ~
+
+rsync -a /mnt/iso/ ~/custom-ubuntu-iso/
+
+sudo umount /mnt/iso
+
+mkdir -p ~/custom-ubuntu-iso/autoinstall
+mkdir: cannot create directory ‘/home/martin/custom-ubuntu-iso/autoinstall’: Permission denied
+
+sudo mkdir -p ~/custom-ubuntu-iso/autoinstall
+
+sudo chown -r 1000:1000 ~/custom-ubuntu-iso
+chown: invalid option -- 'r'
+Try 'chown --help' for more information.
+
+sudo chown -R 1000:1000 ~/custom-ubuntu-iso
+
+ls custom-ubuntu-iso
+EFI  autoinstall  boot  boot.catalog  casper  dists  install  md5sum.txt  pool  ubuntu
+
+cd custom-ubuntu-iso/autoinstall/
+
+ls
+
+nano user-data
+
+uname -r
+5.15.167.4-microsoft-standard-WSL2
+
+nano user-data
+```
