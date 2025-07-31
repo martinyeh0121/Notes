@@ -36,7 +36,7 @@
 | 20250725 | 協助機房主機配線整理 | ✅ |    |   |   |   |
 | 20250728 | cacti 安裝 spine poller | ✅ | | 支援精細抓取間隔 | 快速poll設備指標方案 | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250729 | PVE host rename | ✅ |    |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250729-31 | prometheus 容器/主機監控   | ✅ |    |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250729-31 | prometheus 容器/主機監控   | ✅ |    |   |   | [here](/journals_0/project/monitoring/node_exporter/)   |
 | 備註細項 | node /snmp / dicm exporter | |  | file_sd label/target 維護接口 |  | [wait](/journals_1/ProxmoxVE/README.md)   |
 
 
