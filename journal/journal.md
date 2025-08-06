@@ -1,5 +1,5 @@
 | 時間 from to | 工作內容           | 任務狀態 | 遇到的問題      | 解決方式 / 備註   |  備註2  | Link  |
-|------------|--------------------------------------|----------|------------------------------------|--------------------------------------------------------|----------------------------------------|--------------------------------------|
+|------------------|--------------------------------------|----------|------------------------------------|--------------------------------------------------------|----------------------------------------|--------------------------------------|
 | 20250625 | 使用 PVE 建立 VM 完成 ip 綁定 | ✅ | 無     | 熟悉操作 PVE Node     |  | [here](/journals_1/ProxmoxVE/sop.md#0--建立-proxmox-ve-node-account--設置路由----前言) |
 | 20250626 | 練習用 Node 自訂內網網域 | ✅ | 無     | 熟悉 iptable 指令 / 網卡設定    |  |[here](/journals_1/ProxmoxVE/sop.md#網路拓樸調整)  |
 | 20250626 | 練習 DHCP server 設定  | ⏳ | -- |  |  安全起見，待 VLAN 配置完繼續    |       |
@@ -28,17 +28,26 @@
 | 20250717 | Cacti tree usage | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250718 | snmp script (mib) debug | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250718 | 主機重灌ubuntu / 裝GPU(待監控) | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250721/22 | 主機重灌 ubuntu *6 + 主機配置清點 *8 / 流程優化規劃 | ✅ |   |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250721-22 | 主機重灌 ubuntu *6 + 主機配置清點 *8 / 流程優化規劃 | ✅ |   |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250722 | autoinstall (自動化安裝) 研究 | ✅ | iso 讀取 | 使用 rufus  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250723 | 主機實作 autoinstall 無網路版本 *2 | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250724 | cacti 監控開發環境 (16.xx) | ✅ |    | 系統自動掃描  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250725 | cacti 監控開發環境 (16.xx) | ✅ |    | 系統自動掃描  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250725 | 協助機房主機配線整理 | ✅ |    |   |   |   |
+| 20250725 | 協助機房 主機/配線 整理 | ✅ |    |   |   |   |
 | 20250728 | cacti 安裝 spine poller | ✅ | | 支援精細抓取間隔 | 快速poll設備指標方案 | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250729 | PVE host rename | ✅ |    |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250729-31 | prometheus 容器/主機監控   | ✅ |    |   |   | [here](/journals_0/project/monitoring/node_exporter/)   |
-| 備註細項 | node /snmp / dicm exporter | |  | file_sd label/target 維護接口 |  | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250729 | PVE host rename | ✅ |    | 單純 cluster 環境  |   | [here](/journals_1/ProxmoxVE/sops/sop6/sop6.md)   |
+| 20250729-0801 | prometheus 容器/主機監控   | ✅ |    |   |   | [here](/journals_0/project/monitoring/node_exporter/)   |  |
+| 備註細項 | node / snmp exporter | | | file_sd |  | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250731-0804 | 機房主機盤點 / 新增 2 機架  | ✅ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
+| 20250804-05 | prometheus 容器/主機監控   | ⏳ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
+| 備註細項 | cadvisor / kubelet | | minio(DB)| thanos sidecar/query  | | [wait](/journals_1/ProxmoxVE/README.md)   |  |
+| 20250731-0805 | PVE ceph 基本使用 | ✅ |    |   |   | [here](/journals_1/ProxmoxVE/sops/sop8/sop8.md)   |
+| 20250806 | PVE host rename | ⏳ |    | cluster + ceph 環境  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250806- | prometheus 容器/主機監控   | ⏳ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
+| 備註細項 | cadvisor (host) / process_exporter | | | | | [wait](/journals_1/ProxmoxVE/README.md)   |  |
 
+PCL passthrough + DECM exporter
+prometheus-stack (helm) / distributed
 
 <!-- | 20250703 | cloudinit / autoinstall | ⏳ |    |    |   | here   | -->
 <!-- | 20  | 工作內容             | 任務狀態 | 遇到的問題      | 解決方式 / 備註   |  備註2  | Link  |-->
@@ -46,7 +55,7 @@
 
 
 ✅: 完成 , ⏳: 未完成 , 🔄: 持續調整 daily routine
-☑️: 手冊待調整
+<!-- ☑️: 手冊待調整 -->
 
 - [penal](journals_1/ProxmoxVE/README.md) **<--**
 - [Catalog](/README.md)

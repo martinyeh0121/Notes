@@ -17,7 +17,7 @@ UI (Proxmox VE UI) 、 CLI (Node 的 Shell) 跟 console (VM 的 console (server 
 ## 1. 修改 Proxmox VE Node 套件來源（Repository）
 
 Proxmox VE 預設使用需付費訂閱的 enterprise 軟體來源。若系統未啟用有效訂閱，更新套件時可能出現錯誤或提示訊息。為了正常使用更新功能，建議改用官方提供的 no-subscription（免費）來源。
-(URIs / Suites 類型可能不同，請視自己的情況修改，)
+(URIs / Suites 類型可能不同，enterprise -> no-subscription 即可，其他不用改)
 
 ### 1.1 手動修改 (UI)
 
