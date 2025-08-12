@@ -10,6 +10,8 @@
 
 - [Proxmox VE penal](journals_1/ProxmoxVE/README.md) **<--**
 
+- [interaction panel](journals_1/interaction/report/)
+
 - [OPE_request](/journals_0/project/協助表單/manual.md)
   
 - [Prometheus 網路監控實作手冊](journals_0/project/monitoring/switch_observation/prometheus.md)
