@@ -25,7 +25,7 @@ apt update && apt full-upgrade -y
 pveceph init --mon-address <該節點IP>
 ```
 
-### 建立 mon
+### 建立 monnitor
 ![alt text](image-2.png)
 
 ### 磁碟重建
@@ -128,3 +128,31 @@ ceph osd tree
 ceph osd pool ls detail
 ceph pg ls-by-pool test_pool
 ceph-volume lvm list
+
+
+nano /etc/pve/storage.cfg
+``` cfg
+dir: local
+        path /var/lib/vz
+        content vztmpl,backup,rootdir,iso,images
+        prune-backups keep-last=5
+        shared 0
+
+lvmthin: local-lvm
+        thinpool data
+        vgname pve
+        content images,rootdir
+
+rbd: main
+        content images
+        krbd 0
+        pool main_pool
+
+rbd: test
+        content images
+        krbd 0
+        pool test_pool
+```
+
+root@mbpc220908:/etc/pve/nodes/mbpc220908/qemu-server# ceph fsid
+33ac8156-8c36-4d40-bd7d-673aab433e3f

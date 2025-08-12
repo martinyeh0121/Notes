@@ -31,10 +31,9 @@
 | 20250721-22 | 主機重灌 ubuntu *6 + 主機配置清點 *8 / 流程優化規劃 | ✅ |   |   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250722 | autoinstall (自動化安裝) 研究 | ✅ | iso 讀取 | 使用 rufus  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250723 | 主機實作 autoinstall 無網路版本 *2 | ✅ |    | 參閱 /sopxx   |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250724 | cacti 監控開發環境 (16.xx) | ✅ |    | 系統自動掃描  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
-| 20250725 | cacti 監控開發環境 (16.xx) | ✅ |    | 系統自動掃描  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250724 | cacti 監控開發環境 (16.xx) | ☑️ |    | 系統自動掃描 / nmap script  |   | [here](/journals_1/ProxmoxVE/README.md)   |
 | 20250725 | 協助機房 主機/配線 整理 | ✅ |    |   |   |   |
-| 20250728 | cacti 安裝 spine poller | ✅ | | 支援精細抓取間隔 | 快速poll設備指標方案 | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250728 | cacti 安裝 spine poller | ☑️ | | 支援精細抓取間隔 | 快速poll設備指標方案 | [here](/journals_1/ProxmoxVE/README.md)   |
 | 20250729 | PVE host rename | ✅ |    | 單純 cluster 環境  |   | [here](/journals_1/ProxmoxVE/sops/sop6/sop6.md)   |
 | 20250729-0801 | prometheus 容器/主機監控   | ✅ |    |   |   | [here](/journals_0/project/monitoring/node_exporter/)   |  |
 | 備註細項 | node / snmp exporter | | | file_sd |  | [wait](/journals_1/ProxmoxVE/README.md)   |
