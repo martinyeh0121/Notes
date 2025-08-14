@@ -44,6 +44,16 @@
 | 20250806 | PVE host rename | ⏳ |    | cluster + ceph 環境  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
 | 20250806- | prometheus 容器/主機監控   | ⏳ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
 | 備註細項 | cadvisor (host) / process_exporter | | | | | [wait](/journals_1/ProxmoxVE/README.md)   |  |
+| 20250807 | pve rebuilding | ~ |    | 見 pve 測試環境重建(0813)  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250808 |  | ⏳ |    | 回想  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250808/11 | 日本展示機安裝 | ✅ |    | firewall / 反向tunnel  |   | [-](/journals_1/ProxmoxVE/README.md)   |
+| 20250812 | oetino 機器上架 | ✅ |    | 代安裝  |   | [wait](/journals_1/ProxmoxVE/README.md)   |
+| 20250812 | 建立美律測試環境 | ✅ | disk 網路 設定要確認 | 手動調整(autoinstall 腳本待優化) | 主機顯卡待修復(要更新bios) | [-](/journals_1/ProxmoxVE/README.md)   |
+| 20250813 | 日本機 longhorn backup test | ✅ |    |   |   | [-](/journals_1/ProxmoxVE/README.md)   |
+| 20250813 | QA 測試機重新安裝 | ✅ |    |   |   | [-](/journals_1/ProxmoxVE/README.md)   |
+| 20250813 | prometheus db 修復 / 架構規劃 | ⏳ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
+| 20250813- | pve 測試環境重建  |  |   |  |   | [wait++](/journals_1/ProxmoxVE/scripts/scp/)   |
+| 20250813- | pve 佈設/測試規劃 |  |   |  |   | [here](/journals_1/interaction/report/to20250812.md)   |
 
 PCL passthrough + DECM exporter
 prometheus-stack (helm) / distributed

@@ -9,5 +9,5 @@
 | `/etc/storage.cfg`（如果存在）  | 自訂 storage 設定     | ✅                | 舊版 Proxmox 可能有      |
 | `/etc/lvm/`               | LVM 設定            | ✅                | 如果你用 LVM-thin       |
 | `/etc/zfs/`               | ZFS 設定            | ✅                | 如果你用 ZFS 儲存池        |
-| `/root/`                  | root 帳號設定與 script | ⚠️ 可選            | 有時放備份/自訂 script     |
+| `/root/`                  | root 帳號設定與 script | ✅ 個人            | 有時放備份/自訂 script     |
 | `/etc/cron.*`             | 備份排程與腳本           | ✅                | 包含自訂 cron 任務        |

@@ -299,9 +299,11 @@ rm -rf /var/lib/corosync/*
 rm -rf /etc/corosync/*
 # rm -rf /var/lib/pve-cluster/* 
 #
-# rm -rf    /<mbpc220905>
+
+# cd /etc/pve/nodes
 
 killall -9 pmxcfs
+
 reboot
 ```
 
