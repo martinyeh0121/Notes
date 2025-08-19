@@ -44,6 +44,7 @@ pveceph createosd /dev/sdX
 p.s. 重建 (pveceph createosd) 前務必移除 ceph 相關 OSD 資訊（如有）
 
 ``` sh
+# 18 (reef -)
 # 移除相關 OSD 資訊（如有）
 ceph osd tree
 
@@ -52,14 +53,28 @@ systemctl stop ceph-osd@1
 ceph osd crush remove osd.1
 ceph auth del osd.1
 ceph osd rm osd.1
+
+# 19 (squid +)
+
+
+
 ```
-ceph-volume lvm list
+
 
 ### 建立 pool
 
 ``` sh
-# pg_num 和 pgp_num 根據集群大小調整，PVE 通常會幫你計算，無特殊需求 ceph osd pool create <poolname> 即可。
+# pg_num 和 pgp_num 根據集群大小調整，PVE 通常會幫你計算
+# 無特殊架構需求 ceph osd pool create <poolname> 即可。
 ceph osd pool create <poolname> <pg_num> <pgp_num>
+```
+
+### 刪除 pool
+
+``` sh
+ceph config set mon mon_allow_pool_delete true
+ceph osd pool delete <pool_name> <pool_name> --yes-i-really-really-mean-it
+ceph config set mon mon_allow_pool_delete false
 ```
 
 ![alt text](image-4.png)
@@ -156,3 +171,5 @@ rbd: test
 
 root@mbpc220908:/etc/pve/nodes/mbpc220908/qemu-server# ceph fsid
 33ac8156-8c36-4d40-bd7d-673aab433e3f
+
+
