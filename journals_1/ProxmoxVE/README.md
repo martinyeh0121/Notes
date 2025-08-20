@@ -23,6 +23,26 @@ ProxmoxVE 操作手冊
         - qemu-guest-agent
         - PVE API
 
+    - [sop5](./sops/sop5/sop5.md)
+        - qemu-guest-agent
+        - PVE API
+        
+    - [sop6](./sops/sop6/sop6.md)
+        - qemu-guest-agent
+        - PVE API
+
+    - [sop7](./sops/sop7/sop7.md)
+        - qemu-guest-agent
+        - PVE API
+
+    - [sop8](./sops/sop8/sop8.md)
+        - qemu-guest-agent
+        - PVE API
+        
+    - [sop9](./sops/sop9/sop9.md)
+        - qemu-guest-agent
+        - PVE API
+
 - [scripts](./scripts/scp/script/)
 
 
