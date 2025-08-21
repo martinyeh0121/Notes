@@ -45,7 +45,7 @@ workflows:
 
 2. 重啟容器
 
-- n8n export 指令 + 刪掉 wf/credential
+- docker compose 重建 + n8n in/export 指令 + 刪掉 wf/credential
 
 
 p.s. 2. 目前只搬 workflow, 登入憑證，無 log 紀錄 
