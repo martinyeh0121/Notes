@@ -140,6 +140,8 @@ systemctl restart chronyd # 避免clocl skew
 **其他node**
 
 ``` sh
+pvecm updatecerts
+
 systemctl restart corosync.service pve-cluster.service ceph.target
 ```
 
