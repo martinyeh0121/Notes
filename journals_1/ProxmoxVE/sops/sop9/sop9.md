@@ -112,7 +112,7 @@ mkdir /etc/pve/nodes/<newhostname>
 cp -r /etc/pve/nodes/<oldhostname> /etc/pve/nodes/<newhostname>
 ```
 
-### 3. 改名 
+### 3.1 改名 
 
 ``` sh
 # kernal
@@ -122,27 +122,31 @@ hostnamectl hostname <newhostname>
 # ceph crush map
 ceph osd crush rename-bucket <oldhostname> <newhostname> # 改動為下圖右部分
 
-# ceph mon
-mv /etc/systemd/system/ceph-mon.target.wants/ceph-mon@<oldhostname>.service /etc/systemd/system/ceph-mon.target.wants/ceph-mon@<newhostname>.service 
+# ceph mon/mgr 手動刪掉重建
 ```
 ![alt text](image-7.png) ![alt text](image-3.png)
+
+### 3.2 mon/mgr 重建
+
+ceph mon/mgr 手動刪掉重建 (UI 操作)
+
 
 ### 4. 重啟相關服務
 
 **改名node**
 
 ``` sh
-systemctl restart corosync.service pve-cluster.service ceph.target
-reboot
-systemctl restart chronyd # 避免clocl skew
+systemctl restart corosync.service pve-cluster.service ceph.target pvestatd.service
+pvecm updatecerts
+
+# reboot
+systemctl restart chronyd # clocl skew 修正 (附錄: 重啟後遇到問題)
 ```
 
 **其他node**
 
 ``` sh
-pvecm updatecerts
-
-systemctl restart corosync.service pve-cluster.service ceph.target
+#--
 ```
 
 
@@ -159,3 +163,8 @@ chronyc tracking
 chronyc sources -v
 systemctl restart chronyd
 ```
+
+
+## ref 
+
+- [cluster+ha+ceph_v0](https://www.thomas-krenn.com/en/wiki/Change_hostname_in_a_productive_Proxmox_Ceph_HCI_cluster)
