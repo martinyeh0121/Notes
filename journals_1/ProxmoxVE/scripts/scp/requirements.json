@@ -1,0 +1,38 @@
+{
+  "sshpass": null,
+  "ncdu": null,
+  "ufw": null,
+
+  "snmp": {
+    "snmp": null,
+    "snmpd": {
+      "snmpd.conf": "SNMPv2-MIB (RFC1213-MIB), IF-MIB, HOST-RESOURCES-MIB, UCD-SNMP-MIB, TCP-MIB, UDP-MIB"
+    },
+    "snmp-mibs-downloader": {
+      "description": "download mibs"
+    }
+  },
+
+
+  "bashrc": {
+    "htstory_ts_add": {
+      "commands": [
+        "echo 'HISTTIMEFORMAT=\"%F %T  \"' >> ~/.bashrc",
+        "source ~/.bashrc"
+      ]
+    }
+  },
+
+  "VM": {
+    "qemu-guest-agent": null,
+
+    "server_iso": {
+        "cloud-init": "常規 iso 預設不含此套件"
+    }
+  },
+
+  "Node": {
+    "nfs": null
+  }
+}
+

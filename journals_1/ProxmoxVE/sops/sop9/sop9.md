@@ -89,6 +89,10 @@ zfsutils-linux: 2.2.8-pve1
 
 ## 流程
 
+### 0. 腳本 (1-4步) <---
+
+[/journals_1/ProxmoxVE/scripts/scp/node_setup/ceph/rename_clu_ceph.sh](/journals_1/ProxmoxVE/scripts/scp/node_setup/ceph/rename_clu_ceph.sh)
+
 ### 1. 設定檔調整 (/etc/pve)
 
 - **ceph.conf**
@@ -112,7 +116,7 @@ mkdir /etc/pve/nodes/<newhostname>
 cp -r /etc/pve/nodes/<oldhostname> /etc/pve/nodes/<newhostname>
 ```
 
-### 3.1 改名 
+### 3. 改名 
 
 ``` sh
 # kernal
@@ -126,10 +130,6 @@ ceph osd crush rename-bucket <oldhostname> <newhostname> # 改動為下圖右部
 ```
 ![alt text](image-7.png) ![alt text](image-3.png)
 
-### 3.2 mon/mgr 重建
-
-ceph mon/mgr 手動刪掉重建 (UI 操作)
-
 
 ### 4. 重啟相關服務
 
@@ -139,9 +139,16 @@ ceph mon/mgr 手動刪掉重建 (UI 操作)
 systemctl restart corosync.service pve-cluster.service ceph.target pvestatd.service
 pvecm updatecerts
 
-# reboot
-systemctl restart chronyd # clocl skew 修正 (附錄: 重啟後遇到問題)
+# systemctl restart chronyd # clocl skew 修正 (附錄: 重啟後遇到問題)
 ```
+
+
+
+### 5. mon/mgr 重建
+
+ceph mon/mgr 手動刪掉重建 (UI 操作)
+
+
 
 **其他node**
 

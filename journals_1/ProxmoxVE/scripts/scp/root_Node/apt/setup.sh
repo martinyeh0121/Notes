@@ -18,9 +18,14 @@ apt-get install -y \
     libsmi2-common \
     snmp-mibs-downloader \
     dos2unix \
+    ncdu \
+    ufw \
+    sshpass \
     -o Dpkg::Options::="--force-confdef" \
     -o Dpkg::Options::="--force-confold"
 
+wget https://packages.inverse.ca/PacketFence/debian/12.0/pool/bullseye/s/snmp-mibs-downloader/snmp-mibs-downloader_1.5_all.de
+apt -f install
 # ================== snmp =============================
 
 echo "📂 建立並配置 MIB 目錄..."
@@ -35,11 +40,15 @@ mibs +ALL
 mibdirs /usr/share/snmp/mibs:/usr/share/snmp/mibs/ietf:/usr/share/snmp/mibs/iana:/usr/share/snmp/mibs/site
 EOF
 
-echo "🌐 下載常見 IETF / IANA MIB 檔案..."
+echo "🌐 下載 IETF / IANA MIB 檔案..."
 
-download-mibs
- 
-mv /var/lib/mibs/* /usr/share/snmp/mibs
+# download-mibs
+
+rm -r /usr/share/snmp/mibs/ietf /usr/share/snmp/mibs/iana
+mv /var/lib/mibs/* /usr/share/snmp/mibs ||\
+echo -e '\033[33m[警告] 移動 MIB 檔案失敗，請檢查 /usr/share/snmp/mibs 是否存在 iana/, itef/。
+此問題只會影響 MIB 名稱翻譯，不影響 SNMP 正常運作。\033[0m'
+
 
 echo "🧹 移除 MIB 內多餘 CRLF 字元（轉 UNIX 格式）"
 dos2unix /usr/share/snmp/mibs/**/*.MIB* /usr/share/snmp/mibs/**/*.txt &>/dev/null || true
@@ -47,7 +56,7 @@ dos2unix /usr/share/snmp/mibs/**/*.MIB* /usr/share/snmp/mibs/**/*.txt &>/dev/nul
 # ================== snmpd ============================
 
 echo "🛠️ 產生 snmpd.conf..."
-cp /etc/snmp/snmpd.conf /etc/snmp/snmpd_default.conf # 備份default
+cp /etc/snmp/snmpd.conf /etc/snmp/snmpd_default.conf || echo "/etc/snmp/snmpd.conf 預設檔未備份" # 備份default
 
 cat > /etc/snmp/snmpd.conf << 'EOF'
 sysLocation    Data Center Rack 3
@@ -74,6 +83,17 @@ echo "🚀 啟用並重啟 SNMPD 服務..."
 systemctl enable snmpd
 systemctl restart snmpd
 
+# ================== ufw ================================
+
+ufw disable
+
+# ================== .bashrc ============================
+
+# history ts
+grep -q '^[^#]*HISTTIMEFORMAT="%F %T  "' ~/.bashrc || echo 'HISTTIMEFORMAT="%F %T  "' >> ~/.bashrc
+source ~/.bashrc
+
+
 echo "✅ 所有工具與服務安裝設定完成！"
-echo "👉 可使用 snmpwalk 測試"
+echo "👉 可使用 snmpwalk, history | tail -1 測試"
 

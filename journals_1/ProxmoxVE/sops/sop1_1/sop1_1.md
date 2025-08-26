@@ -86,5 +86,15 @@ nano user-data
 uname -r
 5.15.167.4-microsoft-standard-WSL2
 
-nano user-data
+xorriso -as mkisofs \
+  -r -V "CustomUbuntu22045" \
+  -o ../custom_ubuntu_22.04.5.iso \
+  -J -l \
+  -c boot.catalog \
+  -b boot/grub/i386-pc/eltorito.img \
+     -no-emul-boot -boot-load-size 4 -boot-info-table \
+  -eltorito-alt-boot \
+  -e EFI/boot/bootx64.efi \
+     -no-emul-boot \
+  .
 ```

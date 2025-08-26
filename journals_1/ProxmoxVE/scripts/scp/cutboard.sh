@@ -143,3 +143,42 @@ ostype: l26
 scsi0: local-lvm:vm-603-disk-0,iothread=1,size=32G
 scsihw: virtio-scsi-single
 sockets: 1
+
+
+
+# ==================================================================
+# rm -rf /etc/pve/ceph.conf
+nano ~/ceph.conf
+
+[global]
+fsid = b054de50-7979-11f0-8197-50ebf69b1af7
+mon_initial_members = mbpc220908          
+mon_host = 192.168.16.62 
+public_network = 192.168.16.0/24
+cluster_network = 192.168.16.0/24
+
+
+cephadm bootstrap --mon-ip 192.168.16.62 --config ~/ceph.conf --skip-ssh
+
+ceph cephadm generate-key
+
+ceph cephadm get-pub-key > /root/ceph.pub
+
+cat /root/ceph.pub | ssh root@192.168.16.67 "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+
+Added host 'mbpc220904' with addr '192.168.16.67'
+
+ceph orch host add mbpc220904 192.168.16.67
+
+ceph orch host label add mbpc220904 _admin
+
+# scp /etc/ceph/ceph.conf root@192.168.16.67:/etc/ceph/ceph.conf
+# scp /etc/ceph/ceph.client.admin.keyring root@192.168.16.67:/etc/ceph/ceph.client.admin.keyring
+
+ceph orch apply mon --placement="mbpc220904:1"
+# scp /etc/ceph/ceph.conf root@192.168.16.67:/etc/ceph/ceph.conf
+# scp /etc/ceph/ceph.client.admin.keyring root@192.168.16.67:/etc/ceph/ceph.client.admin.keyring
+
+ceph orch ps
+
+ceph orch host drain mbpc220904

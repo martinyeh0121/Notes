@@ -83,4 +83,4 @@ Host ${SSH_HOST}
 EOF
 
 
-echo "[SUCCESS] SSH 設定完成，可使用：ssh ${KEY_NAME}"
+echo "[SUCCESS] SSH 設定完成，可使用：ssh ${SSH_HOST}"
