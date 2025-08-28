@@ -1,0 +1,25 @@
+# ssh / hostname / pwd
+
+mobagel@172.16.1.10
+mbpcd001010
+dAwMWX8/VKDw3A==
+
+mobagel@172.16.1.11
+mbpcd001011
+X9Uiojl17cbMOA==
+
+mobagel@172.16.1.12
+mbpcd001012
+QvzYNeGd76W68w==
+
+mobagel@172.16.1.13
+mbpcd001013
+n8jE6lnR100+8A==
+
+mobagel@172.16.1.14
+mbpcd001014
+u0Q2+7koQBCfsw==
+
+mobagel@172.16.1.15
+mbpcd001015
+tJ9dCEfvNRf2Kg==
