@@ -12,8 +12,6 @@ HOSTNAME=$(hostname)
 if [[ "$HOSTNAME" == *vm* ]]; then
     echo "🖥️  主機名稱包含 'vm'，安裝 qemu-guest-agent..."
 
-    apt-get update
-
     apt-get install -y \
         qemu-guest-agent \
         -o Dpkg::Options::="--force-confdef" \

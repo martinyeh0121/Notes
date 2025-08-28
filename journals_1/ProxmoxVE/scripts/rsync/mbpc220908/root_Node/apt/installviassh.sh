@@ -41,6 +41,12 @@ for host in "${HOSTS[@]}"; do
     # 記錄失敗的腳本
     failed_scripts=()
     
+    echo "📦 更新套件索引..."
+    if ! ssh "$host" 'sudo apt-get update -y'; then
+        echo "⚠️ 套件索引更新失敗"
+        continue
+    fi
+
     for script in "${INSTALL_SCRIPTS[@]}"; do
         echo "🔄 執行腳本: $script"
         if [ -f "$SETUP_DIR/$script" ]; then

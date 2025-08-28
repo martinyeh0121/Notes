@@ -1,1 +1,0 @@
-scp -r mbvm250603:~/ /root/script/user_VM

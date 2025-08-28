@@ -13,7 +13,6 @@ while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1; do
    sleep 5
 done
 
-apt-get update
 apt-get install -y libpam-pwquality \
     -o Dpkg::Options::="--force-confdef" \
     -o Dpkg::Options::="--force-confold"

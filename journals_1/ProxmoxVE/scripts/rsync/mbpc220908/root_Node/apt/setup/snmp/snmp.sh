@@ -6,8 +6,6 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 export DEBIAN_FRONTEND=noninteractive
-echo "📦 更新套件索引..."
-apt-get update -y
 echo "📥 安裝 SNMP、SNMPD 相關 tools"
 
 apt-get install -y \
