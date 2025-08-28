@@ -1,7 +1,13 @@
 {
-  "sshpass": null,
-  "ncdu": null,
-  "ufw": null,
+  "base": {
+    "wget": null,
+    "unzip": null,
+    "libsmi2-common": null,
+    "dos2unix": null,
+    "sshpass": null,
+    "ncdu": null,
+    "ufw": null
+  },
 
   "snmp": {
     "snmp": null,
@@ -33,6 +39,37 @@
 
   "Node": {
     "nfs": null
+  },
+
+  "monitoring": {
+    "prometheus": {
+      "node_exporter": {
+        "version": "1.9.1",
+        "port": 9100,
+        "systemd": "prometheus_node_exporter.service"
+      }
+    }
+  },
+
+  "security": {
+    "PAM": {
+      "libpam-pwquality": {
+        "settings": {
+          "retry": 3,
+          "minlen": 12,
+          "ucredit": -1,
+          "lcredit": -1,
+          "dcredit": -1,
+          "ocredit": -1,
+          "enforce_for_root": true
+        }
+      },
+      "login_defs": {
+        "PASS_MAX_DAYS": 90,
+        "PASS_MIN_DAYS": 1,
+        "PASS_WARN_AGE": 7
+      }
+    }
   }
 }
 

@@ -148,6 +148,12 @@ pvecm updatecerts
 
 ceph mon/mgr 手動刪掉重建 (UI 操作)
 
+### 6. 重設定 pool 給 node
+
+UI 中編輯pool Datacenter > Storage > <your_pool> > Edit
+重新選更名 node 掛載
+
+![alt text](image-8.png)
 
 
 **其他node**
@@ -170,6 +176,7 @@ chronyc tracking
 chronyc sources -v
 systemctl restart chronyd
 ```
+
 
 
 ## ref 
