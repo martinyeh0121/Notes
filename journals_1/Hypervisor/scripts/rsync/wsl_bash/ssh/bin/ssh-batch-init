@@ -1,0 +1,51 @@
+#!/bin/bash
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UTILS_PATH="$SCRIPT_DIR/../lib/ssh_utils.sh"
+source "$UTILS_PATH"
+
+HOSTS_FILE="$SCRIPT_DIR/../config/hosts.yaml"
+
+# 檢查 hosts.yaml 是否存在
+if [ ! -f "$HOSTS_FILE" ]; then
+    echo "⚠️ 找不到設定檔：$HOSTS_FILE"
+    exit 1
+fi
+
+# ===== 檢查並安裝 sshpass =====
+check_install_sshpass || exit 1
+
+# 讀取 config.key_dir
+RAW_KEY_DIR=$(yq -r '.config.key_dir' "$HOSTS_FILE")
+
+# ===== 設定目錄與檔案 =====
+IFS=':' read -r KEY_DIR CONFIG_PATH <<< "$(setup_ssh_dirs "$RAW_KEY_DIR")"
+
+# 逐台主機處理
+count=$(yq '.hosts | length' "$HOSTS_FILE")
+for ((i=0; i<count; i++)); do
+    USER_HOST=$(yq -r ".hosts[$i].user_host" "$HOSTS_FILE")
+    KEY_NAME=$(yq -r ".hosts[$i].key_name" "$HOSTS_FILE")
+    PASSWORD=$(yq -r ".hosts[$i].password" "$HOSTS_FILE")
+
+    echo "=== 設定 $USER_HOST ($KEY_NAME) ==="
+    KEY_PATH="$KEY_DIR/id_rsa_${KEY_NAME}"
+
+    # ===== 產生並複製金鑰 =====
+    generate_copy_key "$USER_HOST" "$KEY_PATH" "$PASSWORD"
+
+    # ===== 更新 SSH config =====
+    update_ssh_config "$CONFIG_PATH" "$KEY_NAME" "$USER_HOST" "$KEY_PATH"
+
+    # ===== 設定遠端主機 =====
+    NEW_HOSTNAME=$(yq -r ".hosts[$i].setup.hostname // \"\"" "$HOSTS_FILE")
+    NEW_PASSWORD=$(yq -r ".hosts[$i].setup.new_password // \"\"" "$HOSTS_FILE")
+    setup_remote_host "$USER_HOST" "$PASSWORD" "$NEW_HOSTNAME" "$NEW_PASSWORD"
+
+    echo
+done
+
+# ===== 確保主 config include config.d/* =====
+ensure_main_config
+
+echo "✅ 批次 SSH 設定完成"

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# ===== 設定工作目錄 =====
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UTILS_PATH="$SCRIPT_DIR/../lib/ssh_utils.sh"
+source "$UTILS_PATH"
+
+# ===== 互動式輸入 =====
+read -rp "請輸入遠端帳號與 IP（格式: user@host）: " USER_HOST
+read -rp "請輸入 SSH Host 別名（例如 node1）: " SSH_HOST
+read -rp "請輸入金鑰後綴（建議 hostname，例如 mbvm250603）: " KEY_NAME
+read -rsp "請輸入遠端密碼（可留空，按 Enter 跳過）: " PASSWORD
+echo
+read -rp "請輸入 SSH key 目錄相對於 ~/.ssh（例如 mobagel/dev_cluster，預設為 ~/.ssh）: " RAW_KEY_DIR
+
+# ===== 檢查並安裝 sshpass =====
+check_install_sshpass || exit 1
+
+# ===== 設定目錄與檔案 =====
+IFS=':' read -r KEY_DIR CONFIG_PATH <<< "$(setup_ssh_dirs "$RAW_KEY_DIR")"
+KEY_PATH="$KEY_DIR/id_rsa_${KEY_NAME}"
+
+# ===== 產生並複製金鑰 =====
+generate_copy_key "$USER_HOST" "$KEY_PATH" "$PASSWORD"
+
+# ===== 更新 SSH config =====
+update_ssh_config "$CONFIG_PATH" "$SSH_HOST" "$USER_HOST" "$KEY_PATH"
+
+# ===== 確保主 config include config.d/* =====
+ensure_main_config
+
+echo "✅ SSH 設定完成，可使用：ssh ${SSH_HOST}"

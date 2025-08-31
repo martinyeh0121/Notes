@@ -1,14 +1,18 @@
+## 快速連結
+- [工作日誌](/journal_panel/journal.md)
+- [penal.journals_1/Hypervisor (202507~)](/journals_1/Hypervisor/README.md)
+- [penal.journals_0 (202501~202506)](/journals_0/README.md)
+- [Catalog](/README.md)
+
 
 # 筆記傳送門
 
 這裡彙整了本專案的各類技術筆記，方便快速導覽與查閱。
 
+
 ## 目錄
-- [日誌](/journal/journal.md) **<--**
 
 - [todo](/journal/todos.txt) **<--**
-
-- [Proxmox VE penal](journals_1/ProxmoxVE/README.md) **<--**
 
 - [interaction panel](journals_1/interaction/report/) **<--**
 

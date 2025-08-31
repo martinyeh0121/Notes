@@ -1,0 +1,17 @@
+config:
+  key_dir: "mobagel/dev_cluster"  # 相對於 ~/.ssh 的路徑，可選
+
+hosts:
+  - user_host: "user1@192.168.1.101"
+    key_name: "dev-node1"
+    password: "password1"  # 可選
+    setup:  # 可選，主機初始設定
+      hostname: "new-node1"  # 新的 hostname
+      new_password: "newpass1"  # 新的使用者密碼
+  
+  - user_host: "user2@192.168.1.102"
+    key_name: "dev-node2"
+    password: "password2"  # 可選
+    setup:
+      hostname: "new-node2"
+      new_password: "newpass2"

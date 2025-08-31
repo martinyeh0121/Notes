@@ -1,0 +1,15 @@
+config:
+  key_dir: mobagel/server172016001201   # 相對於 ~/.ssh/
+
+hosts:
+  - user_host: mobagel@172.16.1.10
+    key_name: server_001010
+    password: dAwMWX8/VKDw3A==
+    new_hostname: mbpcd001010
+    new_password: dAwMWX8/VKDw3A==
+
+  - user_host: mobagel@172.16.1.11
+    key_name: server_001011
+    password: anotherPass==
+    new_hostname: mbpcd001011
+    new_password: anotherPass==
