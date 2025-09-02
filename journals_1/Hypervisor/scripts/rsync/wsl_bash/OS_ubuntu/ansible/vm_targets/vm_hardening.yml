@@ -1,0 +1,391 @@
+---
+- name: VM Hardening for Ticketmaster + LAFC compliance
+  hosts: vm_targets
+  become: true
+  # vars:
+  #   # === 基本變數（請依環境調整）===
+  #   siem_host: "10.0.0.10"        # 你的集中式日誌/SIEM 收件主機
+  #   siem_port: 514                 # rsyslog TCP 端口
+  #   allowed_ports: [22, 443]       # 基本放行埠（可再加應用埠）
+  #   custom_app_ports: []           # 其他應用埠，例如 [8443, 9200]
+  #   allowed_users: ["svc-admin"]   # 允許 SSH 的帳號白名單（選用）
+  #   min_password_length: 12
+  #   lockout_attempts: 5            # 連續失敗次數即鎖定
+  #   enable_mfa: true               # 啟用 SSH MFA（Google Authenticator 示範）
+  #   enforce_usb_block: true
+  #   require_encrypted_root: true   # 必須檢出 LUKS/加密磁碟，否則 fail（靜態加密要求）:contentReference[oaicite:6]{index=6}
+  #   enable_ids_fail2ban: true      # 輕量入侵防護：fail2ban
+  #   enable_malware_protection: true
+  #   enable_unattended_updates: true
+  #   enable_auditd: true
+  #   enable_rsyslog_forward: true
+  #   # === SSH 強化 ===
+  #   ssh_auth_methods: "publickey,keyboard-interactive"  # 為 MFA 準備:contentReference[oaicite:7]{index=7}:contentReference[oaicite:8]{index=8}
+  #   ssh_permit_root_login: "no"
+  #   ssh_password_auth: "no"        # 政策要求：禁用純密碼；改用金鑰 + MFA:contentReference[oaicite:9]{index=9}:contentReference[oaicite:10]{index=10}
+  vars:
+    siem_host: "{{ lookup('env', 'SIEM_HOST') }}"
+    siem_port: "{{ lookup('env', 'SIEM_PORT') | int }}"
+    allowed_ports: "{{ lookup('env', 'ALLOWED_PORTS').split(',') | map('int') | list }}"
+    custom_app_ports: "{{ lookup('env', 'CUSTOM_APP_PORTS').split(',') | select('length') | map('int') | list }}"
+    allowed_users: "{{ lookup('env', 'ALLOWED_USERS').split() }}"
+    min_password_length: "{{ lookup('env', 'MIN_PASSWORD_LENGTH') | int }}"
+    lockout_attempts: "{{ lookup('env', 'LOCKOUT_ATTEMPTS') | int }}"
+    enable_mfa: "{{ (lookup('env', 'ENABLE_MFA') | lower) in ['true','1','yes'] }}"
+    ssh_auth_methods: "{{ lookup('env', 'SSH_AUTH_METHODS') }}"
+    ssh_permit_root_login: "{{ lookup('env', 'SSH_PERMIT_ROOT_LOGIN') }}"
+    ssh_password_auth: "{{ lookup('env', 'SSH_PASSWORD_AUTH') }}"
+    enforce_usb_block: "{{ (lookup('env', 'ENFORCE_USB_BLOCK') | lower) in ['true','1','yes'] }}"
+    require_encrypted_root: "{{ (lookup('env', 'REQUIRE_ENCRYPTED_ROOT') | lower) in ['true','1','yes'] }}"
+    enable_ids_fail2ban: "{{ (lookup('env', 'ENABLE_IDS_FAIL2BAN') | lower) in ['true','1','yes'] }}"
+    enable_malware_protection: "{{ (lookup('env', 'ENABLE_MALWARE_PROTECTION') | lower) in ['true','1','yes'] }}"
+    enable_unattended_updates: "{{ (lookup('env', 'ENABLE_UNATTENDED_UPDATES') | lower) in ['true','1','yes'] }}"
+    enable_auditd: "{{ (lookup('env', 'ENABLE_AUDITD') | lower) in ['true','1','yes'] }}"
+    enable_rsyslog_forward: "{{ (lookup('env', 'ENABLE_RSYSLOG_FORWARD') | lower) in ['true','1','yes'] }}"
+
+
+  pre_tasks:
+    - name: Assert we are in North America/US region (reminder only)
+      debug:
+        msg: "請確認此 VM 與資料實際部署在 北美/美國 區域；跨境需法遵依據（SCC/BCR）:contentReference[oaicite:11]{index=11}:contentReference[oaicite:12]{index=12}"
+
+    - name: Gather OS family
+      ansible.builtin.setup:
+        gather_subset:
+          - os_family
+          - distribution
+          - distribution_major_version
+          - hardware
+          - network
+
+  tasks:
+    # ---------- 帳號與密碼/MFA ----------
+    - name: Ensure sudo installed
+      package:
+        name: sudo
+        state: present
+
+    - name: Disable root SSH login
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: "PermitRootLogin {{ ssh_permit_root_login }}"
+        create: yes
+        backup: yes
+      notify: restart sshd
+
+    - name: Enforce SSH auth methods (PublicKey + MFA)
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AuthenticationMethods'
+        line: "AuthenticationMethods {{ ssh_auth_methods }}"
+        create: yes
+        backup: yes
+      notify: restart sshd
+
+    - name: Disable SSH password authentication
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: "PasswordAuthentication {{ ssh_password_auth }}"
+        create: yes
+        backup: yes
+      notify: restart sshd
+
+    - name: Restrict SSH to allowed users (optional)
+      when: allowed_users | length > 0
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^AllowUsers'
+        line: "AllowUsers {{ allowed_users | join(' ') }}"
+        create: yes
+        backup: yes
+      notify: restart sshd
+
+    - name: Enforce PAM password quality
+      copy:
+        dest: /etc/security/pwquality.conf
+        content: |
+          minlen = {{ min_password_length }}
+          dcredit = -1
+          ucredit = -1
+          lcredit = -1
+          ocredit = -1
+          maxrepeat = 3
+          gecoscheck = 1
+          dictcheck = 1
+          enforce_for_root
+      backup: yes
+
+    - name: Configure account lockout (pam_faillock)
+      blockinfile:
+        path: /etc/pam.d/common-auth
+        insertafter: BOF
+        create: yes
+        block: |
+          auth required pam_faillock.so preauth silent audit deny={{ lockout_attempts }} unlock_time=900
+          auth [success=1 default=bad] pam_unix.so
+          auth [default=die] pam_faillock.so authfail audit deny={{ lockout_attempts }} unlock_time=900
+          auth sufficient pam_faillock.so authsucc audit deny={{ lockout_attempts }} unlock_time=900
+      when: ansible_facts.os_family in ["Debian", "RedHat"]
+      notify: restart sshd
+
+    - name: Install Google Authenticator MFA (Debian/Ubuntu)
+      when: enable_mfa and ansible_facts.os_family == "Debian"
+      apt:
+        name: libpam-google-authenticator
+        state: present
+        update_cache: yes
+
+    - name: Install Google Authenticator MFA (RHEL-family)
+      when: enable_mfa and ansible_facts.os_family == "RedHat"
+      package:
+        name: google-authenticator
+        state: present
+
+    - name: Enable PAM MFA in sshd (keyboard-interactive)
+      when: enable_mfa
+      blockinfile:
+        path: /etc/pam.d/sshd
+        create: yes
+        block: |
+          # Google Authenticator MFA
+          auth required pam_google_authenticator.so nullok
+      notify: restart sshd
+
+    # ---------- 防火牆 / 網路 / VPN ----------
+    - name: Install firewall (Debian/Ubuntu)
+      when: ansible_facts.os_family == "Debian"
+      apt:
+        name: ufw
+        state: present
+        update_cache: yes
+
+    - name: Configure UFW
+      when: ansible_facts.os_family == "Debian"
+      block:
+        - ufw:
+            state: enabled
+            policy: deny
+        - name: Allow base ports
+          ufw:
+            rule: allow
+            port: "{{ item }}"
+            proto: tcp
+          loop: "{{ allowed_ports + custom_app_ports }}"
+      notify: reload firewall
+
+    - name: Install firewall (RHEL-family)
+      when: ansible_facts.os_family == "RedHat"
+      package:
+        name: firewalld
+        state: present
+
+    - name: Enable & configure firewalld
+      when: ansible_facts.os_family == "RedHat"
+      block:
+        - service:
+            name: firewalld
+            state: started
+            enabled: true
+        - firewalld:
+            service: ssh
+            state: enabled
+            permanent: true
+        - name: Allow base ports
+          firewalld:
+            port: "{{ item }}/tcp"
+            permanent: true
+            state: enabled
+          loop: "{{ (allowed_ports + custom_app_ports) | difference([22]) }}"
+        - command: firewall-cmd --reload
+      notify: reload firewall
+
+    - name: Harden sysctl (disable redirects, rp_filter, tcp syncookies)
+      copy:
+        dest: /etc/sysctl.d/99-secure-network.conf
+        content: |
+          net.ipv4.ip_forward = 0
+          net.ipv4.conf.all.accept_redirects = 0
+          net.ipv4.conf.default.accept_redirects = 0
+          net.ipv4.conf.all.send_redirects = 0
+          net.ipv4.conf.default.send_redirects = 0
+          net.ipv4.conf.all.rp_filter = 1
+          net.ipv4.conf.default.rp_filter = 1
+          net.ipv4.tcp_syncookies = 1
+          net.ipv6.conf.all.accept_redirects = 0
+          net.ipv6.conf.default.accept_redirects = 0
+      notify: reload sysctl
+
+    # ---------- 日誌 / 稽核 / SIEM ----------
+    - name: Ensure journald persistent and size control
+      ini_file:
+        path: /etc/systemd/journald.conf
+        section: Journal
+        option: Storage
+        value: persistent
+      notify: restart journald
+
+    - name: Install rsyslog
+      package:
+        name: rsyslog
+        state: present
+
+    - name: Forward logs to SIEM
+      when: enable_rsyslog_forward
+      copy:
+        dest: /etc/rsyslog.d/90-siem.conf
+        content: |
+          *.* @@{{ siem_host }}:{{ siem_port }}
+      notify: restart rsyslog
+
+    - name: Configure logrotate to keep 52 weeks (≈1 year)
+      copy:
+        dest: /etc/logrotate.d/99-yearly-keep
+        content: |
+          /var/log/*.log {
+            weekly
+            rotate 52
+            missingok
+            notifempty
+            compress
+            delaycompress
+            copytruncate
+          }
+      notify: force logrotate
+
+    - name: Install auditd
+      when: enable_auditd
+      package:
+        name: auditd
+        state: present
+
+    - name: Enable auditd service
+      when: enable_auditd
+      service:
+        name: auditd
+        state: started
+        enabled: true
+
+    # ---------- 系統更新 / 惡意程式防護 ----------
+    - name: Enable unattended security updates (Debian/Ubuntu)
+      when: enable_unattended_updates and ansible_facts.os_family == "Debian"
+      block:
+        - apt:
+            name: unattended-upgrades
+            state: present
+            update_cache: yes
+        - copy:
+            dest: /etc/apt/apt.conf.d/50unattended-upgrades
+            content: |
+              Unattended-Upgrade::Allowed-Origins {
+                "${distro_id}:${distro_codename}-security";
+              };
+              Unattended-Upgrade::Automatic-Reboot "true";
+        - copy:
+            dest: /etc/apt/apt.conf.d/20auto-upgrades
+            content: |
+              APT::Periodic::Update-Package-Lists "1";
+              APT::Periodic::Unattended-Upgrade "1";
+
+    - name: Enable dnf-automatic (RHEL-family)
+      when: enable_unattended_updates and ansible_facts.os_family == "RedHat"
+      block:
+        - package:
+            name: dnf-automatic
+            state: present
+        - lineinfile:
+            path: /etc/dnf/automatic.conf
+            regexp: '^apply_updates ='
+            line: 'apply_updates = yes'
+        - service:
+            name: dnf-automatic.timer
+            state: started
+            enabled: true
+
+    - name: Install malware protection (ClamAV)
+      when: enable_malware_protection
+      package:
+        name: "{{ 'clamav-daemon' if ansible_facts.os_family == 'Debian' else 'clamav' }}"
+        state: present
+
+    # ---------- 入侵防護（輕量） ----------
+    - name: Install and enable fail2ban
+      when: enable_ids_fail2ban
+      package:
+        name: fail2ban
+        state: present
+
+    - name: Configure fail2ban for sshd
+      when: enable_ids_fail2ban
+      copy:
+        dest: /etc/fail2ban/jail.d/ssh-hardening.conf
+        content: |
+          [sshd]
+          enabled = true
+          maxretry = {{ lockout_attempts }}
+          bantime = 1h
+          findtime = 15m
+      notify: restart fail2ban
+
+    # ---------- USB/外接媒體封鎖 ----------
+    - name: Blacklist usb-storage kernel module
+      when: enforce_usb_block
+      copy:
+        dest: /etc/modprobe.d/blacklist-usb.conf
+        content: |
+          blacklist usb-storage
+          blacklist uas
+
+    - name: Disable new USB devices by default (udev rule)
+      when: enforce_usb_block
+      copy:
+        dest: /etc/udev/rules.d/85-usb-block.rules
+        content: |
+          SUBSYSTEM=="usb", ATTR{authorized}="0"
+
+    # ---------- 磁碟加密合規檢查 ----------
+    - name: Check for LUKS/crypto devices
+      shell: "blkid | grep -i 'TYPE=\"crypto_LUKS\"' || true"
+      register: luks_check
+      changed_when: false
+
+    - name: Enforce encrypted disk presence
+      when: require_encrypted_root and luks_check.stdout == ""
+      fail:
+        msg: >
+          未偵測到加密磁碟(LUKS)。為符合【靜態資料加密】要求，請用加密卷重建或掛載加密資料盤後再執行:contentReference[oaicite:13]{index=13}。
+
+    # ---------- 核心 dump / 其他硬化 ----------
+    - name: Disable core dumps
+      copy:
+        dest: /etc/security/limits.d/99-no-core.conf
+        content: |
+          * hard core 0
+          * soft core 0
+
+  handlers:
+    - name: restart sshd
+      service: { name: sshd, state: restarted }
+      listen: restart sshd
+      # 某些 Debian 發行版服務名為 ssh
+      when: "'sshd' in ansible_facts.services or 'ssh' in ansible_facts.services"
+
+    - name: reload firewall
+      debug:
+        msg: "Firewall rules updated."
+
+    - name: reload sysctl
+      command: sysctl --system
+
+    - name: restart journald
+      service: { name: systemd-journald, state: restarted }
+
+    - name: restart rsyslog
+      service: { name: rsyslog, state: restarted }
+
+    - name: force logrotate
+      command: logrotate -f /etc/logrotate.conf
+
+    - name: restart fail2ban
+      service: { name: fail2ban, state: restarted }

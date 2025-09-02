@@ -14,7 +14,7 @@
 | 20250703 | PVE 資料碟轉移 (預計dd) | ⏳ |    |    |   | here   |
 | 20250703 | PVE disk cli 操作 | ✅ |    | gpt 概覽 |   | [here](/journals_1/Hypervisor/man.md#-磁碟與檔案系統--pve--lvm-互動) |
 | 20250703 | 調整 SSH 腳本 sshpass + read | ✅ |    |    |   | [here](/journals_1/Hypervisor/scripts/scp/script/root_Node/sshbatch/VM_sshkey.sh) |
-| 20250703 | 調整 netplan / fstab 腳本 | ✅ |    |    |   | [netplan](/journals_1/Hypervisor/) [fstab](/journals_1/Hypervisor/scripts/scp/script/root_Node/disk/VM_disk_mount.bash)   |
+| 20250703 | 調整 netplan / fstab 腳本 | ✅ |    |    |   | [netplan](/journals_1/Hypervisor/) [fstab](/journals_1/Hypervisor/scripts/rsync/mbpc220908/root_Node/disk/VM_disk_mount.bash)   |
 | 20250707 | PVE 系統碟轉移 (dd/qcow2)  | ✅ |    |    |   | [here](/journals_1/Hypervisor/README.md)   |
 | 20250707 | cloudinit / autoinstall | ⏳ |    |    |   | here   |
 | 20250708 | cluster ops | ⏳ |    |    |   | [here](/journals_1/Hypervisor/README.md)  |
@@ -34,7 +34,7 @@
 | 20250724 | cacti 監控開發環境 (16.xx) | ☑️ |    | 系統自動掃描 / nmap script  |   | [here](/journals_1/Hypervisor/README.md)   |
 | 20250725 | 協助機房 主機/配線 整理 | ✅ |    |   |   |   |
 | 20250728 | cacti 安裝 spine poller | ☑️ | | 支援精細抓取間隔 | 快速poll設備指標方案 | [here](/journals_1/Hypervisor/README.md)   |
-| 20250729 | PVE host rename | ✅ |    | 單純 cluster 環境  |   | [here](/journals_1/Hypervisor/sops/sop6/sop6.md)   |
+| 20250729 | PVE host rename | ✅ |    | 單純 cluster 環境  |   | [here](/journals_1/Hypervisor/README.md)   |
 | 20250729-0801 | prometheus 容器/主機監控   | ✅ |    |   |   | [here](/journals_0/project/monitoring/node_exporter/)   |  |
 | 備註細項 | node / snmp exporter | | | file_sd |  | [wait](/journals_1/Hypervisor/README.md)   |
 | 20250731-0804 | 機房主機盤點 / 新增 2 機架  | ✅ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
@@ -52,8 +52,12 @@
 | 20250813 | 日本機 longhorn backup test | ✅ |    |   |   | [-](/journals_1/Hypervisor/README.md)   |
 | 20250813 | QA 測試機重新安裝 | ✅ |    |   |   | [-](/journals_1/Hypervisor/README.md)   |
 | 20250813 | prometheus db 修復 / 架構規劃 | ⏳ |    |   |   | [wait](/journals_0/project/monitoring/node_exporter/)   |
-| 20250813- | pve 測試環境重建  |  |   |  |   | [wait++](/journals_1/Hypervisor/scripts/scp/)   |
-| 20250813- | pve 佈設/測試規劃 |  |   |  |   | [here](/journals_1/interaction/report/to20250812.md)   |
+| 20250813-15 | pve 測試環境重建  | ✅ |   |  |   | [wait++](/journals_1/Hypervisor/scripts/scp/)   |
+| 20250813-15 | pve ceph 配置研究 | ✅ |   |  |   | [here](/journals_1/interaction/report/to20250812.md)   |
+| 20250820-22 | pve node 改名流程優化 | ✅ | 可不關機 or 關vm |  |  | [here](/journals_1/Hypervisor/README.md)   |
+| 2025080-22 | pve node 改名流程優化 | ✅ | 可不關機  關vm |  |  | [here](/journals_1/Hypervisor/README.md)   |
+| 2025080-22 | pve node 改名流程優化 | ✅ | 可不關機 / 關vm |  |  | [here](/journals_1/Hypervisor/README.md)   |
+| 2025080-22 | pve node 改名流程優化 | ✅ | 可不關機 / 關vm |  |  | [here](/journals_1/Hypervisor/README.md)   |
 
 PCL passthrough + DECM exporter
 prometheus-stack (helm) / distributed
