@@ -113,3 +113,35 @@ sudo systemctl status isc-dhcp-server
 4. 使用的網卡名稱（如 `vmbr1`, `eth0`）
 
 我可以幫你產出一份完整設定。
+
+``` sh
+# 1️⃣ 確認 server 已開啟轉發
+sysctl net.ipv4.ip_forward
+# 若回傳 0，開啟：
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# 套用 net.ipv4.ip_forward=1 到 /etc/sysctl.conf
+
+if grep -q "^[[:space:]]*#\s*net.ipv4.ip_forward" /etc/sysctl.conf; then
+  # 找到被註解的，就取消註解
+  sudo sed -i 's/^[[:space:]]*#\s*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+elif grep -q "^[[:space:]]*net.ipv4.ip_forward" /etc/sysctl.conf; then
+  # 找到已經存在的，就強制改成 1
+  sudo sed -i 's/^[[:space:]]*net.ipv4.ip_forward.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+else
+  # 完全沒有，就加在最後一行
+  echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+fi
+
+
+# 2️⃣ 設定 NAT (讓 172.23.0.0/24 可以透過 192.168.16.62 出去)
+#暫時
+sudo iptables -t nat -A POSTROUTING -s 172.23.0.0/24 -o vmbr0 -j MASQUERADE
+# 永久
+sudo apt install iptables-persistent
+sudo netfilter-persistent save
+
+# 3️⃣ 允許 FORWARD 封包
+sudo iptables -A FORWARD -i vmbr1 -o vmbr0 -j ACCEPT
+sudo iptables -A FORWARD -i vmbr0 -o vmbr1 -m state --state RELATED,ESTABLISHED -j ACCEPT
+```
