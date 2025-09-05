@@ -1,6 +1,6 @@
-git init
-git add .
-git commit -m "Initial commit"
+# git init
+# git add .
+# git commit -m "Initial commit"
 
 
 ### 多個 remote 設定

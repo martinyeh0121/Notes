@@ -9,6 +9,7 @@ if [ ! -f ~/.ssh/id_rsa_mygithub ]; then
     cat ~/.ssh/id_rsa_mygithub.pub
 else
     echo "個人 GitHub 金鑰已存在，跳過生成"
+    cat ~/.ssh/id_rsa_mygithub.pub
 fi
 
 # 檢查並生成公司 GitHub 金鑰
@@ -19,13 +20,14 @@ if [ ! -f ~/.ssh/id_rsa_mbgithub ]; then
     cat ~/.ssh/id_rsa_mbgithub.pub
 else
     echo "公司 GitHub 金鑰已存在，跳過生成"
+    cat ~/.ssh/id_rsa_mbgithub.pub
 fi
 
 eval "$(ssh-agent -s)" # 啟用 ssh-agent（一般系統預設會啟）
 
 ssh-add ~/.ssh/id_rsa_mygithub    # 加入金鑰並輸入一次密碼，之後整個 session（開機期間）都不用再輸入密碼
 
-ssh-add ~/.ssh/id_rsa_mbgithub    # 加入金鑰並輸入一次密碼，之後整個 session（開機期間）都不用再輸入密碼
+# ssh-add ~/.ssh/id_rsa_mbgithub    # 加入金鑰並輸入一次密碼，之後整個 session（開機期間）都不用再輸入密碼
 
 ssh -T git@github.com # yes
 
