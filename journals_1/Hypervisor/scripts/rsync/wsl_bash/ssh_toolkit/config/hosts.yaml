@@ -1,0 +1,94 @@
+config:
+  key_dir: mobagel/server192168004201   # 相對於 ~/.ssh/
+  steps:
+    setup_remote: true   # 是否設定 hostname 和密碼
+
+# 主機資訊映射
+hosts_map:
+  data_trans:  # key_name 作為 key
+    user: "mobagel"
+    host: "192.168.16.71"
+    password: mobagel
+    setup:
+      hostname: "mbpcd016071"
+      new_password: "ZbyuO5eLzZg1KQ=="
+  server_001010:  # key_name 作為 key
+    user: "mobagel"
+    host: "172.16.1.10"
+    password: "dAwMWX8/VKDw3A=="
+    setup:
+      hostname: "mbpcd001010"
+      new_password: "dAwMWX8/VKDw3A=="
+  
+  server_001011:
+    user: "mobagel"
+    host: "172.16.1.11"
+    password: "X9Uiojl17cbMOA=="
+    setup:
+      hostname: "mbpcd001011"
+      new_password: "X9Uiojl17cbMOA=="
+
+  server_001012:
+    user: "mobagel"
+    host: "172.16.1.12"
+    password: "QvzYNeGd76W68w=="
+    setup:
+      hostname: "mbpcd001012"
+      new_password: "QvzYNeGd76W68w=="
+
+  server_001013:
+    user: "mobagel"
+    host: "172.16.1.13"
+    password: "n8jE6lnR100+8A=="
+    setup:
+      hostname: "mbpcd001013"
+      new_password: "n8jE6lnR100+8A=="
+
+  server_001014:
+    user: "mobagel"
+    host: "172.16.1.14"
+    password: "u0Q2+7koQBCfsw=="
+    setup:
+      hostname: "mbpcd001014"
+      new_password: "u0Q2+7koQBCfsw=="
+
+  server_001015:
+    user: "mobagel"
+    host: "172.16.1.15"
+    password: "tJ9dCEfvNRf2Kg=="
+    setup:
+      hostname: "mbpcd001015"
+      new_password: "tJ9dCEfvNRf2Kg=="
+  
+  server_001015:
+    user: "mobagel"
+    host: "172.16.1.15"
+    password: "tJ9dCEfvNRf2Kg=="
+    setup:
+      hostname: "mbpcd001015"
+      new_password: "tJ9dCEfvNRf2Kg=="
+
+  server192168004201:
+    user: "root"
+    host: "192.168.4.201"
+    password: "Supermicromobagel#2"
+    setup:
+      hostname: "mbpcp192168004201"
+      new_password: "Supermicromobagel#2"
+  
+  mbvmp004064:
+    user: "mobagel"
+    host: "192.168.4.64"
+    password: "mobagel"
+    setup:
+      hostname: "mbvmp004064"
+      new_password: "UgD+NoaMb5Znyw=="
+
+# openssl rand -base64 16  # MS"I"
+
+# /home/marti/home/rsync/mbpc220908/root_Node/apt/installviassh.sh
+# echo "mobagel ALL=(ALL) NOPASSWD:ALL" | sudo tee /etc/sudoers.d/mobagel-nopasswd > /dev/null
+# 要處理的主機列表（可以選擇性處理部分主機）
+hosts:
+  - mbvmp004064
+  # - data_trans

@@ -15,18 +15,25 @@ fi
 # ===== 檢查並安裝 sshpass =====
 check_install_sshpass || exit 1
 
-# 讀取 config.key_dir
+# 讀取設定
 RAW_KEY_DIR=$(yq -r '.config.key_dir' "$HOSTS_FILE")
+DO_SETUP_REMOTE=$(yq -r '.config.steps.setup_remote // false' "$HOSTS_FILE")
+
+# 顯示執行步驟
+echo "執行步驟設定:"
+echo "- 設定遠端主機: ${DO_SETUP_REMOTE}"
+echo
 
 # ===== 設定目錄與檔案 =====
 IFS=':' read -r KEY_DIR CONFIG_PATH <<< "$(setup_ssh_dirs "$RAW_KEY_DIR")"
 
 # 逐台主機處理
-count=$(yq '.hosts | length' "$HOSTS_FILE")
-for ((i=0; i<count; i++)); do
-    USER_HOST=$(yq -r ".hosts[$i].user_host" "$HOSTS_FILE")
-    KEY_NAME=$(yq -r ".hosts[$i].key_name" "$HOSTS_FILE")
-    PASSWORD=$(yq -r ".hosts[$i].password" "$HOSTS_FILE")
+for KEY_NAME in $(yq -r '.hosts[]' "$HOSTS_FILE"); do
+    # 讀取主機資訊
+    USER=$(yq -r ".hosts_map.${KEY_NAME}.user" "$HOSTS_FILE")
+    HOST=$(yq -r ".hosts_map.${KEY_NAME}.host" "$HOSTS_FILE")
+    PASSWORD=$(yq -r ".hosts_map.${KEY_NAME}.password // \"\"" "$HOSTS_FILE")
+    USER_HOST="${USER}@${HOST}"
 
     echo "=== 設定 $USER_HOST ($KEY_NAME) ==="
     KEY_PATH="$KEY_DIR/id_rsa_${KEY_NAME}"
@@ -38,9 +45,11 @@ for ((i=0; i<count; i++)); do
     update_ssh_config "$CONFIG_PATH" "$KEY_NAME" "$USER_HOST" "$KEY_PATH"
 
     # ===== 設定遠端主機 =====
-    NEW_HOSTNAME=$(yq -r ".hosts[$i].setup.hostname // \"\"" "$HOSTS_FILE")
-    NEW_PASSWORD=$(yq -r ".hosts[$i].setup.new_password // \"\"" "$HOSTS_FILE")
-    setup_remote_host "$USER_HOST" "$PASSWORD" "$NEW_HOSTNAME" "$NEW_PASSWORD"
+    if [ "$DO_SETUP_REMOTE" = "true" ]; then
+        NEW_HOSTNAME=$(yq -r ".hosts_map.${KEY_NAME}.setup.hostname // \"\"" "$HOSTS_FILE")
+        NEW_PASSWORD=$(yq -r ".hosts_map.${KEY_NAME}.setup.new_password // \"\"" "$HOSTS_FILE")
+        setup_remote_host "$USER_HOST" "$PASSWORD" "$NEW_HOSTNAME" "$NEW_PASSWORD" "$KEY_NAME"
+    fi
 
     echo
 done

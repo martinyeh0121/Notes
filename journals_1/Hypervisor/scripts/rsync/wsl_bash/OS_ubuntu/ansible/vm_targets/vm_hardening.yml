@@ -26,8 +26,27 @@
   vars:
     siem_host: "{{ lookup('env', 'SIEM_HOST') }}"
     siem_port: "{{ lookup('env', 'SIEM_PORT') | int }}"
-    allowed_ports: "{{ lookup('env', 'ALLOWED_PORTS').split(',') | map('int') | list }}"
-    custom_app_ports: "{{ lookup('env', 'CUSTOM_APP_PORTS').split(',') | select('length') | map('int') | list }}"
+    
+    # 安全解析 ALLOWED_PORTS（允許空白、空值）
+  allowed_ports: >-
+    {{
+      (lookup('env','ALLOWED_PORTS') | default('22,443') | trim)
+      | split(',')
+      | map('trim')
+      | reject('equalto','')
+      | map('int')
+      | list
+    }}
+
+  # 安全解析 CUSTOM_APP_PORTS（空值 => []）
+  custom_app_ports: >-
+    {{
+      (lookup('env','CUSTOM_APP_PORTS') | default('', true) | trim)
+        | length > 0
+      and (lookup('env','CUSTOM_APP_PORTS') | split(',') | map('trim') | reject('equalto','') | map('int') | list)
+      or []
+    }}
+    
     allowed_users: "{{ lookup('env', 'ALLOWED_USERS').split() }}"
     min_password_length: "{{ lookup('env', 'MIN_PASSWORD_LENGTH') | int }}"
     lockout_attempts: "{{ lookup('env', 'LOCKOUT_ATTEMPTS') | int }}"
@@ -115,7 +134,7 @@
           gecoscheck = 1
           dictcheck = 1
           enforce_for_root
-      backup: yes
+        backup: yes
 
     - name: Configure account lockout (pam_faillock)
       blockinfile:
@@ -153,69 +172,97 @@
           auth required pam_google_authenticator.so nullok
       notify: restart sshd
 
-    # ---------- 防火牆 / 網路 / VPN ----------
-    - name: Install firewall (Debian/Ubuntu)
-      when: ansible_facts.os_family == "Debian"
+        # ---------- 防火牆 / 網路 / VPN ----------
+    - name: Install UFW
       apt:
         name: ufw
         state: present
         update_cache: yes
 
-    - name: Configure UFW
-      when: ansible_facts.os_family == "Debian"
-      block:
-        - ufw:
-            state: enabled
-            policy: deny
-        - name: Allow base ports
-          ufw:
-            rule: allow
-            port: "{{ item }}"
-            proto: tcp
-          loop: "{{ allowed_ports + custom_app_ports }}"
+    - name: Configure UFW - default deny
+      ufw:
+        state: enabled
+        policy: deny
+
+    # - name: Configure UFW - allow base and custom ports
+    #   ufw:
+    #     rule: allow
+    #     port: "{{ item }}"
+    #     proto: tcp
+    #   loop: "{{ allowed_ports + custom_app_ports }}"
+    #   notify: reload firewall
+    - name: Configure UFW - allow base and custom ports
+      ufw:
+        rule: allow
+        port: "{{ item }}"
+        proto: tcp
+      loop: "{{ (allowed_ports | default([])) + (custom_app_ports | default([])) }}"
       notify: reload firewall
 
-    - name: Install firewall (RHEL-family)
-      when: ansible_facts.os_family == "RedHat"
-      package:
-        name: firewalld
-        state: present
 
-    - name: Enable & configure firewalld
-      when: ansible_facts.os_family == "RedHat"
-      block:
-        - service:
-            name: firewalld
-            state: started
-            enabled: true
-        - firewalld:
-            service: ssh
-            state: enabled
-            permanent: true
-        - name: Allow base ports
-          firewalld:
-            port: "{{ item }}/tcp"
-            permanent: true
-            state: enabled
-          loop: "{{ (allowed_ports + custom_app_ports) | difference([22]) }}"
-        - command: firewall-cmd --reload
-      notify: reload firewall
+    # # ---------- 防火牆 / 網路 / VPN ----------
+    # - name: Install firewall (Debian/Ubuntu)
+    #   when: ansible_facts.os_family == "Debian"
+    #   apt:
+    #     name: ufw
+    #     state: present
+    #     update_cache: yes
 
-    - name: Harden sysctl (disable redirects, rp_filter, tcp syncookies)
-      copy:
-        dest: /etc/sysctl.d/99-secure-network.conf
-        content: |
-          net.ipv4.ip_forward = 0
-          net.ipv4.conf.all.accept_redirects = 0
-          net.ipv4.conf.default.accept_redirects = 0
-          net.ipv4.conf.all.send_redirects = 0
-          net.ipv4.conf.default.send_redirects = 0
-          net.ipv4.conf.all.rp_filter = 1
-          net.ipv4.conf.default.rp_filter = 1
-          net.ipv4.tcp_syncookies = 1
-          net.ipv6.conf.all.accept_redirects = 0
-          net.ipv6.conf.default.accept_redirects = 0
-      notify: reload sysctl
+    # - name: Configure UFW
+    #   when: ansible_facts.os_family == "Debian"
+    #   block:
+    #     - ufw:
+    #         state: enabled
+    #         policy: deny
+    #     - name: Allow base ports
+    #       ufw:
+    #         rule: allow
+    #         port: "{{ item }}"
+    #         proto: tcp
+    #       loop: "{{ allowed_ports + custom_app_ports }}"
+    #   notify: reload firewall
+
+    # - name: Install firewall (RHEL-family)
+    #   when: ansible_facts.os_family == "RedHat"
+    #   package:
+    #     name: firewalld
+    #     state: present
+
+    # - name: Enable & configure firewalld
+    #   when: ansible_facts.os_family == "RedHat"
+    #   block:
+    #     - service:
+    #         name: firewalld
+    #         state: started
+    #         enabled: true
+    #     - firewalld:
+    #         service: ssh
+    #         state: enabled
+    #         permanent: true
+    #     - name: Allow base ports
+    #       firewalld:
+    #         port: "{{ item }}/tcp"
+    #         permanent: true
+    #         state: enabled
+    #       loop: "{{ (allowed_ports + custom_app_ports) | difference([22]) }}"
+    #     - command: firewall-cmd --reload
+    #   notify: reload firewall
+
+    # - name: Harden sysctl (disable redirects, rp_filter, tcp syncookies)
+    #   copy:
+    #     dest: /etc/sysctl.d/99-secure-network.conf
+    #     content: |
+    #       net.ipv4.ip_forward = 0
+    #       net.ipv4.conf.all.accept_redirects = 0
+    #       net.ipv4.conf.default.accept_redirects = 0
+    #       net.ipv4.conf.all.send_redirects = 0
+    #       net.ipv4.conf.default.send_redirects = 0
+    #       net.ipv4.conf.all.rp_filter = 1
+    #       net.ipv4.conf.default.rp_filter = 1
+    #       net.ipv4.tcp_syncookies = 1
+    #       net.ipv6.conf.all.accept_redirects = 0
+    #       net.ipv6.conf.default.accept_redirects = 0
+    #   notify: reload sysctl
 
     # ---------- 日誌 / 稽核 / SIEM ----------
     - name: Ensure journald persistent and size control
@@ -243,14 +290,32 @@
       copy:
         dest: /etc/logrotate.d/99-yearly-keep
         content: |
-          /var/log/*.log {
-            weekly
-            rotate 52
-            missingok
-            notifempty
-            compress
-            delaycompress
-            copytruncate
+          # /etc/logrotate.d/99-system-logs
+          /var/log/syslog
+          /var/log/auth.log
+          /var/log/kern.log
+          /var/log/messages {
+              weekly
+              rotate 52
+              missingok
+              notifempty
+              compress
+              delaycompress
+              copytruncate
+              dateext
+          }
+
+          # /etc/logrotate.d/99-app-logs
+          /var/log/nginx/*.log
+          /var/log/myapp/*.log {
+              weekly
+              rotate 14   # 大約保留 3 個月
+              missingok
+              notifempty
+              compress
+              delaycompress
+              copytruncate
+              dateext
           }
       notify: force logrotate
 
@@ -344,17 +409,17 @@
         content: |
           SUBSYSTEM=="usb", ATTR{authorized}="0"
 
-    # ---------- 磁碟加密合規檢查 ----------
-    - name: Check for LUKS/crypto devices
-      shell: "blkid | grep -i 'TYPE=\"crypto_LUKS\"' || true"
-      register: luks_check
-      changed_when: false
+    # # ---------- 磁碟加密合規檢查 ----------
+    # - name: Check for LUKS/crypto devices
+    #   shell: "blkid | grep -i 'TYPE=\"crypto_LUKS\"' || true"
+    #   register: luks_check
+    #   changed_when: false
 
-    - name: Enforce encrypted disk presence
-      when: require_encrypted_root and luks_check.stdout == ""
-      fail:
-        msg: >
-          未偵測到加密磁碟(LUKS)。為符合【靜態資料加密】要求，請用加密卷重建或掛載加密資料盤後再執行:contentReference[oaicite:13]{index=13}。
+    # - name: Enforce encrypted disk presence
+    #   when: require_encrypted_root and luks_check.stdout == ""
+    #   fail:
+    #     msg: >
+    #       未偵測到加密磁碟(LUKS)。為符合【靜態資料加密】要求，請用加密卷重建或掛載加密資料盤後再執行:contentReference[oaicite:13]{index=13}。
 
     # ---------- 核心 dump / 其他硬化 ----------
     - name: Disable core dumps
@@ -371,9 +436,11 @@
       # 某些 Debian 發行版服務名為 ssh
       when: "'sshd' in ansible_facts.services or 'ssh' in ansible_facts.services"
 
+    # - name: reload firewall
+    #   debug:
+    #     msg: "Firewall rules updated."
     - name: reload firewall
-      debug:
-        msg: "Firewall rules updated."
+      command: ufw reload
 
     - name: reload sysctl
       command: sysctl --system

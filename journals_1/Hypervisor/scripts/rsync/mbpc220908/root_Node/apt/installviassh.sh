@@ -46,6 +46,12 @@ for host in "${HOSTS[@]}"; do
         echo "⚠️ 套件索引更新失敗"
         continue
     fi
+        
+    echo "⬆️ 升級套件..."
+    if ! ssh "$host" 'sudo apt-get upgrade -y'; then
+        echo "⚠️ 套件升級失敗"
+        continue
+    fi
 
     for script in "${INSTALL_SCRIPTS[@]}"; do
         echo "🔄 執行腳本: $script"

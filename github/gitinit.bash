@@ -1,6 +1,6 @@
-# git init
-# git add .
-# git commit -m "Initial commit"
+git init
+git add .
+git commit -m "Initial commit"
 
 
 ### 多個 remote 設定
@@ -17,6 +17,8 @@ git remote set-url --add --push origin git@github.com:martinyeh0121/Notes.git
 # 設定 main 的 upstream（只要設定一次）
 git branch --set-upstream-to=origin/main main
 
+# -u（或 --set-upstream）
+git push -u origin main
 
 ###
 # git remote add origin {gitrepo} # git remote set-url origin {gitrepo}

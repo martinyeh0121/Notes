@@ -60,10 +60,17 @@ generate_copy_key() {
     local key_path=$2
     local password=$3
 
-    # 產生金鑰
-    ssh-keygen -f "$key_path" -N "" -q
+    # 檢查金鑰是否已存在
+    if [ -f "$key_path" ]; then
+        echo "🔑 使用既有金鑰：$key_path"
+    else
+        echo "🔄 產生新金鑰：$key_path"
+        # 產生金鑰
+        ssh-keygen -f "$key_path" -N "" -q
+    fi
 
     # 複製到遠端
+    echo "🔄 複製金鑰到遠端..."
     if [ -n "$password" ]; then
         sshpass -p "$password" ssh-copy-id \
             -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
@@ -136,7 +143,14 @@ setup_remote_host() {
     fi
 
     if [ -n "$commands" ]; then
-        sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$user_host" "$commands"
+        # 先嘗試使用 SSH key 登入
+        if ssh -o PasswordAuthentication=no -o BatchMode=yes "$key_name" "echo '✅ SSH key 登入成功'" 2>/dev/null; then
+            echo "🔑 使用 SSH key 登入"
+            ssh "$key_name" "$commands"
+        else
+            echo "⚠️ SSH key 登入失敗，使用密碼登入"
+            sshpass -p "$password" ssh -o StrictHostKeyChecking=no "$user_host" "$commands"
+        fi
         echo "✅ 遠端主機設定完成"
     fi
 }

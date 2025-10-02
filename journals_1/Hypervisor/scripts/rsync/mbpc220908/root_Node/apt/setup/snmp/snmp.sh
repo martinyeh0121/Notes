@@ -7,6 +7,7 @@ fi
 
 export DEBIAN_FRONTEND=noninteractive
 echo "📥 安裝 SNMP、SNMPD 相關 tools"
+echo "🌐 下載常見 IETF / IANA MIB 檔案..."
 
 apt-get install -y \
     snmp \
@@ -29,9 +30,8 @@ mibs +ALL
 mibdirs /usr/share/snmp/mibs:/usr/share/snmp/mibs/ietf:/usr/share/snmp/mibs/iana:/usr/share/snmp/mibs/site
 EOF
 
-echo "🌐 下載常見 IETF / IANA MIB 檔案..."
 
-download-mibs
+# download-mibs
  
 mv /var/lib/mibs/* /usr/share/snmp/mibs
 

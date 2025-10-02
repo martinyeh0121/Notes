@@ -83,9 +83,14 @@ hostnamectl set-hostname "$NEW"
 
 ### 複製 node 設定 ###
 echo "🔧 複製 PVE node 設定..."
-mkdir -p "$PVE_NODES_DIR/$NEW"
-cp -r "$PVE_NODES_DIR/$OLD/"* "$PVE_NODES_DIR/$NEW/"
+# mkdir -p "$PVE_NODES_DIR/$NEW"
+mkdir -p "${HOME}/backup/"
+cp -r "$PVE_NODES_DIR/$OLD" "${HOME}/backup"
+cp -r "$PVE_NODES_DIR/$OLD/" "$PVE_NODES_DIR/$NEW/"
+mv "$PVE_NODES_DIR/$OLD/qemu-server"* "$PVE_NODES_DIR/$NEW/qemu-server"
 
+echo "✅ 已完成複製 PVE node 設定..."
+echo "✅ 備份路徑：${HOME}/backup/$OLD"
 
 ### 更新 ceph.conf 和 corosync.conf ###
 echo "🔧 更新主機名稱於設定檔..."
@@ -109,7 +114,7 @@ read -p "是否確認重啟相關服務？(y/n): " confirm
 if [[ "$confirm" == "y" ]]; then
     systemctl restart corosync.service pve-cluster.service ceph.target pvestatd.service
     pvecm updatecerts
-    # systemctl restart pveproxy.service
+    systemctl restart pveproxy.service pvedaemon.service
 fi
 
 echo "✅ 所有修改已完成。請手動重建 cephmgr 和 cephmon 服務"

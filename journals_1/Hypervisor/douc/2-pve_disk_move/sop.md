@@ -14,7 +14,8 @@ script:
 [scripts](/journals_1/ProxmoxVE/scripts/disk/home/)
 
 ## 0.0 目標
-
+38Djy0j6dMK0CA==
+RtREspnFcO5VTg==
 /var/lib/vz/images (local)
 
 

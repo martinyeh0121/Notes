@@ -1,5 +1,9 @@
-XY
 
+# ref
+https://pve.proxmox.com/pve-docs/pve-admin-guide.html#_time_synchronization
+gpt
+
+## 實際操作
 ``` sh
 # 查看目前的磁碟與分割資訊，確認裝置名稱
 lsblk
@@ -37,6 +41,19 @@ zpool create fastpool raidz2 /dev/sdX /dev/sdY /dev/sdZ /dev/sdW
 
 # RAIDZ3 → 類似 RAID7，至少 5 顆，允許壞 3 顆
 zpool create fastpool raidz3 /dev/sdX /dev/sdY /dev/sdZ /dev/sdW /dev/sdV
+
+```
+
+
+``` sh 
+zfs set compression=lz4 <pool or dataset>
+zfs create -o compression=lz4 tank/mydata
+zfs get compression,compressratio <dataset>
+
+### !!!  -o
+# ashift 選錯會造成效能浪費：
+#    ashift=12：適用於現代 4K 磁碟（推薦）
+#    ashift=9：適用於 512-byte 的老磁碟（不再常見）
 
 ```
 

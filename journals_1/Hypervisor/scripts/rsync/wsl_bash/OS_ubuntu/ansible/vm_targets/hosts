@@ -1,2 +1,2 @@
 [vm_targets]
-vm1 ansible_host=35.192.133.199 ansible_user=root
+vm1 ansible_host=35.192.133.199 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa_soc

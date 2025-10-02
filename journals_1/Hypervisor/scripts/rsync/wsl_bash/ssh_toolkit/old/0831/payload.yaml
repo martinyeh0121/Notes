@@ -1,5 +1,8 @@
 config:
   key_dir: mobagel/server172016001201   # 相對於 ~/.ssh/
+  steps:
+    #  copy_key: true      # 是否複製金鑰到遠端
+    setup_remote: false  # 是否設定 hostname 和密碼
 
 hosts:
   - user_host: mobagel@172.16.1.10

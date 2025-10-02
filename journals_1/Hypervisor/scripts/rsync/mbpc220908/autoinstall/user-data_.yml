@@ -1,0 +1,97 @@
+#cloud-config
+autoinstall:
+  version: 1
+
+  identity:
+    hostname: mobagel
+    username: mobagel
+    password: "$6$86W25k.P6HDI162Z$.3TbXTuYEa/3mbJeibHGy1k64GW7LdG6vKXjJhsdKZL7IrJKrzsVoIkXZ8WoqLrGdQrOv6opTm6MbEwSzdkio0"
+    # 使用 openssl passwd -6 "<yourPassword>"加密後產生密文，開機時能用 "<yourPassword>" 登入
+
+  keyboard:
+    layout: us
+
+  locale: en_US.UTF-8
+
+  network:
+    version: 2
+    ethernets:
+      enp6s18:
+        dhcp4: true
+        # dhcp6: true
+
+  storage:
+    layout:
+      name: direct
+    config:
+
+      # Boot 分割區與掛載（EFI）
+      - type: partition
+        id: boot-partition
+        device: disk0
+        size: 1G
+        flag: boot
+      - type: format
+        id: boot-format
+        volume: boot-partition
+        fstype: fat32
+      - type: mount
+        id: boot-mount
+        device: boot-format
+        path: /boot/efi
+
+      # Root 分割區與掛載
+      - type: partition
+        id: root-partition
+        device: disk0
+        size: -1
+      - type: format
+        id: root-format
+        volume: root-partition
+        fstype: ext4
+      - type: mount
+        id: root-mount
+        device: root-format
+        path: /
+
+      # # Data 分割區與掛載
+      # - type: partition
+      #   id: data-partition
+      #   device: disk0
+      #   size: -1
+      # - type: format
+      #   id: data-format
+      #   volume: data-partition
+      #   fstype: ext4
+      # - type: mount
+      #   id: data-mount
+      #   device: data-format
+      #   path: /data
+    
+
+  ssh:
+    install-server: true
+    allow-pw: true
+
+  packages: 
+    - ubuntu-server # 安裝 ubuntu-server 套件
+    - qemu-guest-agent
+    # 安裝官方建議的套件
+    - ufw
+    - net-tools
+    - openssh-server
+    - vim
+    - curl
+    - wget
+    - sudo
+    - snapd
+    
+  late-commands:
+    # 關閉 cloud-init 自動網路設定
+    # - 'curtin in-target -- sh -c "echo ''network: {config: disabled}'' > /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg"'
+    # - 'curtin in-target -- sh -c "echo ''mobagel ALL=(ALL) NOPASSWD:ALL'' > /etc/sudoers.d/mobagel-nopasswd"'
+    - 'echo "network: {config: disabled}" > /target/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg'
+    - 'echo "mobagel ALL=(ALL) NOPASSWD:ALL" > /target/etc/sudoers.d/mobagel-nopasswd'
+    - 'curtin in-target -- chmod 440 /etc/sudoers.d/mobagel-nopasswd'
+    - 'curtin in-target -- usermod -aG sudo mobagel'
+    - 'curtin in-target -- systemctl enable qemu-guest-agent'
